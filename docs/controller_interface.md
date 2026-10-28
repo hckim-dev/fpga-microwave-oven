@@ -12,7 +12,7 @@
 | `tick_1ms` | 1 ms마다 한 클럭 enable. 내부 1,000회 누적으로 1초 감소 |
 | `button_pulse[6:0]` | [입력 Interface](input_interface.md)의 동일한 이벤트 순서 |
 | `rotary_cw`, `rotary_ccw` | 클릭당 한 클럭. 두 신호 동시 입력은 무시 |
-| `door_closed` | 이후 도어 FSM이 제공할 닫힘 추정 상태. 현재는 TB가 공급 |
+| `door_closed` | STEP 8 도어 FSM이 제공하는 닫힘 추정 상태. 이전 단위 TB는 직접 공급 |
 | `alert_done` | STEP 6 표시 완료 후 공급. DONE에서만 사용. STEP 7 종료음은 같은 표시 시간 기준 |
 | `state[1:0]` | IDLE=0, RUN=1, PAUSED=2, DONE=3 |
 | `remaining_seconds[11:0]` | 남은 총 초. 유효 범위 0~3,599 |
@@ -72,4 +72,5 @@ FSM의 닫힘 조건이 없어지면 PAUSED가 됩니다. 이미 닫혔을 때�
 축소해 원시 입력부터 제어 결과까지 검사합니다. 둘 다 실제 보드 결과가 아닙니다.
 STEP 6의 `tb_controller_display`에서 FND 및 완료 통지를 연결해 추가 검증했습니다.
 STEP 7의 `tb_display_sound`에서 같은 종료 시간 기준의 부저도 연결해 검증했습니다.
-도어 FSM, 서보와 PWM은 아직 연결하지 않았습니다.
+STEP 8의 `tb_door_control`에서 도어 FSM·서보의 닫힘 추정과 개폐 중단/재개를 연결해 검증했습니다.
+실제 모터 PWM과 전체 보드 Top은 아직 연결하지 않았습니다.

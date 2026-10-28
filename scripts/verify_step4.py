@@ -37,6 +37,8 @@ def main(stage=4):
         tests += ["tb_display_controller", "tb_controller_display"]
     if stage >= 7:
         tests += ["tb_sound_controller", "tb_display_sound"]
+    if stage >= 8:
+        tests += ["tb_servo_controller", "tb_door_controller", "tb_door_control"]
     sources = rtl + [test_dir / f"{name}.v" for name in tests]
     compile_args = [executables["xvlog"], *map(str, sources)]
 
@@ -55,7 +57,13 @@ def main(stage=4):
     for name in tests:
         run(f"elaborate_{name}", [executables["xelab"], name, "-s", name, "-debug", "typical"])
         tcl = out / f"{name}.tcl"
-        tcl.write_text("log_wave -r /\nrun all\nquit\n", encoding="utf-8")
+        wave_command = "log_wave -r /"
+        if name == "tb_servo_controller":
+            # 기본 40 ms 검사는 고속 내부 카운터 대신 외부 펄스·제어 신호만 기록.
+            signals = ["scenario", "reset", "enable", "target_open", "servo_pwm", "applied",
+                       "default_reset", "default_target", "default_pwm", "default_applied"]
+            wave_command = "log_wave " + " ".join(f"/{name}/{signal}" for signal in signals)
+        tcl.write_text(wave_command + "\nrun all\nquit\n", encoding="utf-8")
         # XSim 생성 Tcl에서 Windows 역슬래시가 escape로 해석되지 않게 한다.
         output = run(f"simulate_{name}", [executables["xsim"], name, "-tclbatch", tcl.as_posix(),
                                          "-wdb", (out / f"{name}.wdb").as_posix()])

@@ -1,16 +1,16 @@
 # 요구사항 추적
 
-PDF의 기능 요구와 예시를 구분합니다. STEP 7 완료는 전체 기능 및 실제 보드 검증 완료를 뜻하지 않습니다.
+PDF의 기능 요구와 예시를 구분합니다. STEP 8 완료는 전체 기능 및 실제 보드 검증 완료를 뜻하지 않습니다.
 
 | ID | 요구사항 | 현재 구현 Source | Simulation/Testbench | 실제 Hardware | 발표 근거 |
 | --- | --- | --- | --- | --- | --- |
 | R01 | 로터리로 분·초 설정 | `input_frontend.v`, `rotary_decoder.v`, `microwave_controller.v` | 입력·제어·연계 TB PASS: 00:00~59:59 설정과 경계 | 미확인 | STEP 4/5 로그·WDB |
-| R02 | 문 열기/닫기 효과음 | `sound_controller.v`: 수락 이벤트를 리듬으로 재생 | 부저/연계 TB PASS: 개폐 패턴·BEEP 우선·FIFO. 실제 도어 FSM 연계는 이후 단계 | 미확인 | STEP 7 로그·WDB |
+| R02 | 문 열기/닫기 효과음 | `door_controller.v`, `sound_controller.v`: 수락 이벤트를 리듬으로 재생 | 부저/도어 연계 TB PASS: 실제 도어 FSM 이벤트와 중복/이동 요청 필터링 | 미확인 | STEP 7/8 로그·WDB |
 | R03 | 버튼마다 BEEP | `input_frontend.v`, `sound_controller.v` | 입력·부저 TB PASS: 동시/연속 요청 보존, ON/OFF 길이, 큐 초과 표시 | 미확인 | STEP 4/7 로그·WDB |
 | R04 | 동작 종료 알림 | `microwave_controller.v`, `display_controller.v`, `sound_controller.v` | 연계 TB PASS: 0000 3회 점멸과 동일한 종료음 envelope, 3초 후 복귀 | 미확인 | STEP 5/6/7 로그·WDB |
 | R05 | 동작 표시 | `display_controller.v`, `fnd_scanner.v` | 표시 TB PASS: 3,600개 시간 값, 선택 필드·일시정지·circle 교대·스캔 | 미확인 | STEP 6 로그·WDB |
-| R06 | 취소 | `microwave_controller.v`, `sound_controller.v`: 시간·표시·재생/대기 취소 | 제어·표시·부저 연계 TB PASS. 실제 모터/서보 취소는 이후 통합 필요 | 미확인 | STEP 5/6/7 로그·WDB |
-| R07 | 서보로 문 개폐 | 입력 이벤트·가열 시작 차단/중단만 | 제어·연계 TB PASS: 논리적 닫힘 조건과 수동 재개. 서보 미구현 | 미확인 | STEP 5 로그·WDB, 실제 개폐는 미확보 |
+| R06 | 취소 | 시간·표시·소리 취소, 도어 이동 취소와 서보 펄스 차단 | 제어·표시·부저·도어 연계 TB PASS. 모터 취소는 이후 단계 | 미확인 | STEP 5~8 로그·WDB |
+| R07 | 서보로 문 개폐 | `door_controller.v`, `servo_controller.v` | 서보·도어·연계 TB PASS: 프레임/폭, 명령 적용, 대기/개폐 추정과 가열 차단 | 미확인 | STEP 8 로그·WDB, 실제 개폐는 미확보 |
 | R08 | 모터 PWM 속도 제어 | 속도 +/- 이벤트만 | `tb_input_frontend`: 입력 PASS. PWM 미구현 | 미확인 | 미확보 |
 | R09 | 자체 아이디어 | 기본 기능 안정화 후 선정 | 미실행 | 미확인 | 미확보 |
 

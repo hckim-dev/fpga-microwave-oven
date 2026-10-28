@@ -1,5 +1,56 @@
 # 검증 기록
 
+## STEP 8 - 서보·도어 제어
+
+2026-10-28, XSim 2026.1에서 `scripts/verify_step8.py`로 기존 8개와 신규 3개 TB를
+실행하여 모두 PASS를 확인했습니다. 최종 근거는
+`build/step8/20261028_133450_768322/`의 열한 PASS 로그와 WDB입니다.
+
+| 완료 조건 | 실제 결과 |
+| --- | --- |
+| 기본 100 MHz·20 ms 프레임과 1/1.5 ms 펄스 폭 | 4,000,000클럭, 두 전체 프레임을 축소 없이 PASS |
+| HIGH 도중 목표 변경 시 다음 프레임부터 반영 | PASS |
+| 최초/변경 명령의 1클럭 적용 통지와 반복 프레임 중복 통지 없음 | PASS |
+| disable/Reset 즉시 펄스 차단, 재활성 시 새 프레임 | PASS |
+| 작은 프레임·펄스 폭, MoveTimeMs=1 계수 | PASS |
+| UNKNOWN 기동, 명령 적용 전 이동 완료 금지 | PASS |
+| 명령 확인 후 기본 500 tick 대기 경계 | PASS |
+| 열기 우선, 중복/이동 중 요청 필터링과 계수 지속 | PASS |
+| 이동 취소 후 UNKNOWN, 완료 위치에서 취소 시 유지 명령 | PASS |
+| 닫힘 추정 전 시작 차단, 실행 중 열기 중단과 수동 재개 | PASS |
+| 도어 FSM 수락 이벤트의 효과음 재생, 중복 요청은 BEEP만 | PASS |
+| 취소 시 시간·서보 이동·대기 효과음 폐기와 닫기 복구 | PASS |
+| STEP 4~7 회귀 | 기존 8개 TB PASS |
+| 실제 문 위치·서보 각도/전류·기구 부하·이동 시간 | 미확인 |
+
+`tb_servo_controller`는 기본 Parameter로 두 프레임 동안 PWM·적용 통지를 매 클럭
+기대값과 대조합니다. 첫 프레임 HIGH 중 목표를 변경해도 첫 펄스는 100,000클럭,
+다음 프레임 펄스는 150,000클럭인지 검사합니다. 별도 축소 인스턴스에서 disable/Reset,
+중간 목표 왕복과 재시작도 확인합니다. 관찰 신호는 `scenario`, `enable`, `target_open`,
+`servo_pwm`, `applied`, `default_pwm`, `default_applied`입니다.
+약 40 ms 동안 고속 내부 카운터를 모두 기록하지 않고 이 외부 신호만 WDB에 기록합니다.
+
+`tb_door_controller`는 서보 적용 통지를 직접 공급합니다. 확인 전 1,000 tick이 지나도
+닫힘으로 바뀌지 않는지, 적용 확인 뒤 499/500 tick 경계와 취소 우선순위를 검사합니다.
+관찰 신호는 `scenario`, `state`, `door_closed`, `servo_enable`, `target_open`,
+`open_request`, `close_request`, `applied`, `open_event`, `close_event`, `cancel`입니다.
+tick 간격만 줄이고 기본 500회 이동 계수는 유지합니다.
+
+`tb_door_control`은 도어·서보·가열·부저를 연결합니다. 이 연계 TB에서만 서보 프레임과
+이동 대기 Parameter를 축소합니다. 초기 UNKNOWN, 닫기와 KEY 동시 입력, 명시적 시작,
+실행 중 열기, 닫힘 후 별도 KEY 재개, 이동 취소·복구, 수락된 닫기 효과음 완료와
+중복 닫기의 효과음 미발생을 확인합니다. 관찰 신호는 `scenario`, `cook_state`, `door_state`,
+`servo_pwm`, `applied`, `open_event/close_event`, `remaining_seconds`, `run_enable`,
+`buzzer`, `sound_busy`입니다. 이는 도어 경로의 Interface 검증이며 전체 Integration은 아닙니다.
+
+최종 컴파일·elaboration·Simulation 로그에는 경고·오류가 없습니다.
+XPR의 사용자 선택 Top과 Vivado 저장 상태는 보존하고 신규 파일만 등록했습니다.
+재생성 스크립트도 Vivado에서 실행해 별도 STEP 8 프로젝트 생성과 compile order 갱신을
+완료했습니다. 해당 프로젝트의 RTL 11개·TB 11개와 원본 XPR의 Source 참조 23개를 확인했습니다.
+XDC와 기존 가열/표시/부저 RTL은 변경하지 않았습니다.
+합성·Implementation·Timing·Bitstream·보드 다운로드·실제 개폐는 수행하지 않았습니다.
+펄스 폭과 이동 대기는 실기 보정 전 초기값이며 실제 닫힘 검증을 대신하지 않습니다.
+
 ## STEP 7 - 부저와 표시 연계
 
 2026-10-28, XSim 2026.1에서 `scripts/verify_step7.py`로 기존 6개와 신규 2개 TB를
