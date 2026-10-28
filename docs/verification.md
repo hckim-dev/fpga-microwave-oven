@@ -1,5 +1,27 @@
 # 검증 기록
 
+## STEP 12 — 코드 최종 확인, 실기 기록 대기
+
+기준 커밋 `7bb28f1`의 조작 잠금을 포함한 최종 코드를 재검토했습니다.
+추가 RTL 수정이 필요한 결함은 발견하지 않았으며 기능 요구 R01~R09는 구현되어 있습니다.
+최신 Simulation은 `build/step11/20261028_152816_897567/`에서 16개 모두 PASS입니다.
+컴파일/elaboration/Simulation 경고·오류가 없고 Python 설정 회귀 9개도 OK입니다.
+
+검토 도중 XPR에서 `control_lock.v`, `tb_control_lock.v`, `tb_top_control_lock.v` 등록이
+제거되고 Simulation Top이 이전 TB로 바뀐 파일 변경을 확인했습니다. 누락된 등록은 복구하고
+선택된 `tb_top_microwave_oven`은 유효한 사용자 선택으로 유지했습니다. 당시 파일은
+`build/step11_final_review_xpr_before.xml`에 보존했습니다. 변경한 프로그램·사용자 작업을
+직접 관찰한 것은 아니며, 열린 프로젝트의 이전 설정 저장에 의한 덮어쓰기를 의심합니다.
+
+복구 후 저장소 검사와 `build/step11_closure_project_console.txt`의 Vivado 읽기 전용
+검사가 PASS입니다. 현재 RTL/TB·활성 XDC는 기준 커밋과 같아 합성·Timing은 재실행하지 않았으며
+`build/board/20261028_152128_18104/`의 정상 빌드 결과를 사용합니다.
+보드 프로그래밍과 새 SW0 기능의 실제 조작 확인은 이번 검토에서 실행하지 않았습니다.
+
+남은 완료 조건은 [조작 잠금](control_lock.md)의 실기 6단계 확인과
+[하드웨어 확인](hardware_test.md)의 결과 기록·사진/영상·발표자료입니다.
+SG90 떨림 이슈는 사용자 판단으로 종결 상태를 유지합니다.
+
 ## STEP 11 — 조작 잠금(R09)
 
 2026-10-28, Vivado/XSim 2026.1에서 SW0 조작 잠금을 구현하고 검증했습니다.

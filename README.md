@@ -63,9 +63,11 @@ python scripts/verify_step11.py --vivado-bin "C:/AMDDesignTools/2026.1/Vivado/bi
 
 ## Vivado에서 열기
 
-기존 `fpga-microwave-oven.xpr`의 Design Top은 `top_microwave_oven`, Simulation Top은
-`tb_top_control_lock`으로 변경했습니다. 열려 있던 Vivado에서는 프로젝트를 다시 여세요.
+기존 `fpga-microwave-oven.xpr`의 Design Top은 `top_microwave_oven`입니다.
+조작 잠금 검사는 Simulation Sources에서 `tb_top_control_lock`을 Set as Top으로 선택하고
 Run Behavioral Simulation → Run All → `PASS:`를 확인합니다.
+외부에서 XPR이 갱신된 경우 RTL/TB 편집 내용은 먼저 저장하되, 열려 있던 프로젝트 설정으로
+디스크의 XPR을 덮어쓰지 말고 프로젝트를 닫았다 다시 열어 소스 등록을 반영하세요.
 보드 Design Top은 `top_microwave_oven`으로 유지하고 Simulation Top만 단위 TB로 바꿀 수 있습니다.
 Top 테스트는 실제 버튼·로터리 포트를 구동하며 내부 이벤트를 강제 주입하지 않습니다.
 
