@@ -32,24 +32,39 @@ module input_frontend #(
   wire [1:0] w_clean_ab;
   wire w_decoder_reset;
 
-  reset_synchronizer u_reset (.clk(clk), .reset(reset), .synced_reset(synced_reset));
-  tick_generator #(.TickCount(TickCount)) u_tick (
-      .clk(clk), .reset(synced_reset), .tick(tick_1ms)
+  reset_synchronizer u_reset (
+      .clk(clk),
+      .reset(reset),
+      .synced_reset(synced_reset)
+  );
+  tick_generator #(
+      .TickCount(TickCount)
+  ) u_tick (
+      .clk  (clk),
+      .reset(synced_reset),
+      .tick (tick_1ms)
   );
 
   genvar i;
   generate
     for (i = 0; i < 7; i = i + 1) begin : g_button
-      btn_debouncer #(.DebounceCount(ButtonDebounceCount)) u_debounce (
-          .clk(clk), .reset(synced_reset),
+      btn_debouncer #(
+          .DebounceCount(ButtonDebounceCount)
+      ) u_debounce (
+          .clk(clk),
+          .reset(synced_reset),
           .noisy_btn(button_raw[i] ^ ButtonActiveLow[i]),
           .clean_btn(w_clean_button[i])
       );
     end
     for (i = 0; i < 2; i = i + 1) begin : g_rotary
-      btn_debouncer #(.DebounceCount(RotaryDebounceCount)) u_debounce (
-          .clk(clk), .reset(synced_reset),
-          .noisy_btn(rotary_ab_raw[i]), .clean_btn(w_clean_ab[i])
+      btn_debouncer #(
+          .DebounceCount(RotaryDebounceCount)
+      ) u_debounce (
+          .clk(clk),
+          .reset(synced_reset),
+          .noisy_btn(rotary_ab_raw[i]),
+          .clean_btn(w_clean_ab[i])
       );
     end
   endgenerate
@@ -58,7 +73,7 @@ module input_frontend #(
   always @(posedge clk or posedge synced_reset) begin
     if (synced_reset) begin
       r_settle_count <= 0;
-      r_prev_button <= 0;
+      r_prev_button  <= 0;
     end else begin
       if (!ready) r_settle_count <= r_settle_count + 1'b1;
       r_prev_button <= w_clean_button;
@@ -70,8 +85,14 @@ module input_frontend #(
   assign button_pulse = ready ? (w_clean_button & ~r_prev_button) : 7'b0;
   assign w_decoder_reset = synced_reset || !ready;
 
-  rotary_decoder #(.StepsPerDetent(StepsPerDetent)) u_rotary (
-      .clk(clk), .reset(w_decoder_reset), .ab(w_clean_ab),
-      .cw_pulse(rotary_cw), .ccw_pulse(rotary_ccw), .invalid_pulse(rotary_invalid)
+  rotary_decoder #(
+      .StepsPerDetent(StepsPerDetent)
+  ) u_rotary (
+      .clk(clk),
+      .reset(w_decoder_reset),
+      .ab(w_clean_ab),
+      .cw_pulse(rotary_cw),
+      .ccw_pulse(rotary_ccw),
+      .invalid_pulse(rotary_invalid)
   );
 endmodule

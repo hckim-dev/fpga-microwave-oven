@@ -9,7 +9,7 @@ module tb_display_controller;
   reg select_minutes = 0;
   wire [7:0] seg;
   wire [3:0] an;
-  wire alert_done;
+  wire alert_done, alert_on;
   reg [3:0] scenario = 0;
   integer phase, value, k;
   reg [7:0] circle_expected;
@@ -19,18 +19,18 @@ module tb_display_controller;
   integer scan_checks = 0;
   wire [7:0] seg_min;
   wire [3:0] an_min;
-  wire done_min;
+  wire done_min, on_min;
   reg [1:0] state_min = 0;
 
   display_controller dut (
       .clk(clk), .reset(reset), .tick_1ms(tick_1ms), .state(state),
       .remaining_seconds(remaining_seconds), .select_minutes(select_minutes),
-      .seg(seg), .an(an), .alert_done(alert_done)
+      .seg(seg), .an(an), .alert_done(alert_done), .alert_on(alert_on)
   );
   display_controller #(.BlinkHalfMs(1), .ScreenPeriodMs(1), .CircleStepMs(1)) u_min (
       .clk(clk), .reset(reset), .tick_1ms(tick_1ms), .state(state_min),
       .remaining_seconds(12'd0), .select_minutes(1'b0),
-      .seg(seg_min), .an(an_min), .alert_done(done_min)
+      .seg(seg_min), .an(an_min), .alert_done(done_min), .alert_on(on_min)
   );
   always #5 clk = ~clk;
 
@@ -166,13 +166,14 @@ module tb_display_controller;
     scenario = 4;
     state = 3; settle_mode();
     for (phase = 0; phase < 6; phase = phase + 1) begin
+      if (alert_on !== ((phase % 2) == 0)) $fatal(1, "shared alert ON phase");
       if ((phase % 2) == 0) check_frame(32'hC0C0C0C0);
       else check_frame(32'hFFFFFFFF);
       advance_ms(495);
       if (alert_done || dut.r_done_phase != phase) $fatal(1, "DONE half-period early");
       advance_ms(1);
     end
-    if (!alert_done) $fatal(1, "DONE must finish after three ON/OFF cycles");
+    if (!alert_done || alert_on) $fatal(1, "DONE must finish after three ON/OFF cycles");
     advance_ms(20);
     check_frame(32'hFFFFFFFF);
     if (!alert_done) $fatal(1, "completion must remain until acknowledged");
@@ -199,7 +200,7 @@ module tb_display_controller;
     advance_ms(5);
     if (done_min) $fatal(1, "minimum parameter finished early");
     advance_ms(1);
-    if (!done_min) $fatal(1, "minimum parameter completion");
+    if (!done_min || on_min) $fatal(1, "minimum parameter completion");
     state = 3; settle_mode();
     advance_ms(123);
     #2 reset = 1; #1;

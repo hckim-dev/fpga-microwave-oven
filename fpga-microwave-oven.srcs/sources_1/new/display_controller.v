@@ -13,7 +13,8 @@ module display_controller #(
     input wire select_minutes,
     output wire [7:0] seg,
     output wire [3:0] an,
-    output wire alert_done
+    output wire alert_done,
+    output wire alert_on
 );
   localparam [1:0] IDLE = 0, RUN = 1, PAUSED = 2, DONE = 3;
   localparam integer BlinkWidth = (BlinkHalfMs > 1) ? $clog2(BlinkHalfMs) : 1;
@@ -121,6 +122,7 @@ module display_controller #(
 
   // 제어부가 DONE을 떠날 때까지 유지하여 높은 우선순위 이벤트와 겹쳐도 보존.
   assign alert_done = !reset && (state == DONE) && r_finished;
+  assign alert_on = !reset && (state == DONE) && !r_done_phase[0] && !r_finished;
 
   always @(*) begin
     case (r_circle_step)
@@ -154,7 +156,7 @@ module display_controller #(
                       ((state == PAUSED) && r_blink_on))) w_pattern[7] = 0;
       if ((state == RUN) && r_show_circle) w_pattern = w_circle_pattern;
       if (state == DONE) begin
-        if (!r_done_phase[0] && !r_finished) w_pattern = 8'hC0;
+        if (alert_on) w_pattern = 8'hC0;
         else w_pattern = 8'hFF;
       end
       w_patterns[i*8 +: 8] = w_pattern;

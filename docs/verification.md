@@ -1,5 +1,55 @@
 # 검증 기록
 
+## STEP 7 - 부저와 표시 연계
+
+2026-10-28, XSim 2026.1에서 `scripts/verify_step7.py`로 기존 6개와 신규 2개 TB를
+실행하여 모두 PASS를 확인했습니다. 최종 근거는
+`build/step7/20261028_132252_599669/`의 여덟 PASS 로그와 WDB입니다.
+
+| 완료 조건 | 실제 결과 |
+| --- | --- |
+| BEEP 40 tick ON, 20 tick 무음, 버튼마다 요청 계수 | PASS |
+| 취소를 제외한 6개 버튼 동시 입력 보존 | PASS |
+| 열기 ON/OFF/ON과 닫기 연속 ON 리듬 | PASS |
+| BEEP 우선 재생과 도어 효과음 진행 보존·재개 | PASS |
+| 도어 효과음 FIFO 순서와 동시에 dequeue/enqueue | PASS |
+| BEEP 큐 동시 dequeue/enqueue | PASS |
+| 큐 용량 초과의 포화/폐기와 sticky overflow 표시 | PASS |
+| 취소 시 재생/대기 폐기 후 BEEP 하나만 재생 | PASS |
+| Reset 즉시 출력 차단과 큐 초기화 | PASS |
+| ON/OFF 및 수동 부저 carrier 모드 | PASS |
+| 기본 25,000클럭 반주기, 2 kHz carrier | 축소 없이 PASS |
+| 최소 계수 Parameter 1 | PASS |
+| FND/종료음 동일 envelope, 3,000 DONE tick 중 1,500 ON tick | PASS |
+| 종료 후 자동 IDLE, 취소/KEY 뒤 오래된 알림 없음 | PASS |
+| STEP 4~6 회귀 | 기존 6개 TB PASS |
+| 실제 부저 음량·음색·전류·직결 적합성 | 미확인 |
+
+`tb_sound_controller`는 버튼·수락된 도어 이벤트·종료 envelope를 직접 공급합니다.
+관찰 신호는 `scenario`, `buttons`, `open_event`, `close_event`, `alert_active/on`,
+`buzzer`, `sound_active`, `busy`, `overflow`와 내부 큐·재생 단계입니다.
+리듬은 실제 기본 40/20/70 tick을 유지하고 tick 간격만 4클럭으로 축소합니다.
+별도 carrier 인스턴스는 기본 25,000클럭 반주기를 유지하여 75,000클럭을 대조합니다.
+다중 입력, 재생 중 입력, 큐 입출력 동시성, 용량 초과와 복구를 자동 판정합니다.
+
+`tb_display_sound`는 제어·표시·부저를 연결합니다. 도어 닫힘은 TB가 공급하고 실제 도어
+수락 이벤트도 TB에서 별도로 입력합니다. 1초 가열 후 3초 종료 표시/음향 envelope,
+자동 대기 복귀, 종료 중 취소·KEY, 버튼 BEEP 후 도어 효과음 순서를 확인합니다.
+관찰 신호는 `scenario`, `state`, `remaining_seconds`, `alert_on`, `alert_done`,
+`buzzer`, `sound_active`, `done_ticks`, `alert_on_ticks`, `seg/an`입니다.
+이는 논리 출력과 Interface 검사이며 실제 청취나 전체 Hardware Integration 결과가 아닙니다.
+
+종료 ON 구간을 표시부의 추가 출력 `alert_on`으로 공유했습니다. 출력 추가 후 기존 표시 TB의
+미연결 경고를 확인하여 두 TB도 새 신호에 연결하고 위상/완료 후 소등 검사를 추가했습니다.
+최종 컴파일·elaboration·Simulation 로그에는 경고·오류가 없습니다.
+기존 제어 상태·우선순위와 XDC는 변경하지 않았습니다.
+원래 남아 있던 `input_frontend.v` 변경은 공백 제거 비교로 기능 변화 없는 정렬임을 확인했고,
+사용자 요청에 따라 이번 커밋에 포함합니다. 기존 입력 TB도 함께 통과했습니다.
+
+Vivado 프로젝트 재생성도 실행하여 RTL 9개·TB 8개 등록과 compile order 갱신을 완료했습니다.
+원본 XPR의 파일 참조와 문서 링크는 정적으로 검사했습니다. 합성·Implementation·Timing·
+Bitstream·보드 다운로드·실제 청취는 이번 단계에서 수행하지 않았습니다.
+
 ## STEP 6 - FND 표시
 
 2026-10-28, XSim 2026.1에서 `scripts/verify_step6.py`로 기존 4개와 신규 2개 TB를

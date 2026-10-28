@@ -9,7 +9,7 @@ module tb_controller_display;
   wire tick_1ms = (r_tick_count == 4);
   wire [1:0] state;
   wire [11:0] remaining_seconds;
-  wire select_minutes, run_enable, timeout_pulse, alert_done;
+  wire select_minutes, run_enable, timeout_pulse, alert_done, alert_on;
   wire [7:0] seg;
   wire [3:0] an;
   reg [3:0] scenario = 0;
@@ -28,7 +28,7 @@ module tb_controller_display;
   display_controller u_display (
       .clk(clk), .reset(reset), .tick_1ms(tick_1ms), .state(state),
       .remaining_seconds(remaining_seconds), .select_minutes(select_minutes),
-      .seg(seg), .an(an), .alert_done(alert_done)
+      .seg(seg), .an(an), .alert_done(alert_done), .alert_on(alert_on)
   );
   always #5 clk = ~clk;
   always @(posedge clk) begin
@@ -40,6 +40,7 @@ module tb_controller_display;
       prev_state = 0;
       prev_alert_done = 0;
     end else begin
+      if (alert_done && alert_on) $fatal(1, "completed alert must be silent");
       if (state == 3 && tick_1ms) done_ticks = done_ticks + 1;
       if (alert_done && !prev_alert_done) completed_alerts = completed_alerts + 1;
       if (state != 3 && prev_state == 3) begin
