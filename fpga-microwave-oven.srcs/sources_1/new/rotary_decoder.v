@@ -5,6 +5,7 @@ module rotary_decoder #(
 ) (
     input wire clk,
     input wire reset,
+    input wire enable,
     input wire [1:0] ab,
     output reg cw_pulse,
     output reg ccw_pulse,
@@ -45,7 +46,10 @@ module rotary_decoder #(
       invalid_pulse <= 0;
 
       // 초기 위상을 먼저 저장하여 Reset 해제 자체를 회전으로 세지 않음.
-      if (!r_seeded) begin
+      if (!enable) begin
+        r_seeded <= 0;
+        r_steps <= 0;
+      end else if (!r_seeded) begin
         r_steps <= 0;
       end else if (w_invalid) begin
         r_steps <= 0;

@@ -30,7 +30,6 @@ module input_frontend #(
   reg [6:0] r_prev_button;
   wire [6:0] w_clean_button;
   wire [1:0] w_clean_ab;
-  wire w_decoder_reset;
 
   reset_synchronizer u_reset (
       .clk(clk),
@@ -83,13 +82,14 @@ module input_frontend #(
   assign ready = !synced_reset && (r_settle_count == SettleCount);
   assign button_down = ready ? w_clean_button : 7'b0;
   assign button_pulse = ready ? (w_clean_button & ~r_prev_button) : 7'b0;
-  assign w_decoder_reset = synced_reset || !ready;
 
   rotary_decoder #(
       .StepsPerDetent(StepsPerDetent)
   ) u_rotary (
       .clk(clk),
-      .reset(w_decoder_reset),
+      .reset(synced_reset),
+      // 기동 대기는 동기식 enable로 처리하여 조합 논리의 비동기 Reset 구동 방지.
+      .enable(ready),
       .ab(w_clean_ab),
       .cw_pulse(rotary_cw),
       .ccw_pulse(rotary_ccw),

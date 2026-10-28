@@ -1,5 +1,64 @@
 # 검증 기록
 
+## STEP 10 - 보드 Top 통합과 빌드
+
+2026-10-28, Vivado/XSim 2026.1 build 6511674에서 실행했습니다.
+
+| 확인 항목 | 실제 결과 |
+| --- | --- |
+| 기존 13개 + Top 통합 TB | 14개 모두 PASS, 컴파일/elaboration/Simulation 경고·오류 없음 |
+| Top raw 입력 | 기동 중 KEY 억제, 짧은 bounce, CW/CCW·분초 선택, 속도 변경 PASS |
+| 전체 동작 경로 | UNKNOWN 시작 차단, 닫기 후 수동 시작, 정지/재개, 개폐 중단, 취소 PASS |
+| 완료 연계 | 만료 시 모터 정지, timeout 1회, DONE 3,000 tick, 표시/소리 envelope 일치 PASS |
+| 동시 요청 | 취소 > 열기 > 닫기/KEY, 이동 중 취소와 Reset 출력 차단 PASS |
+| 합성·배치배선·Bitstream | 완료, routing error 0, DRC 위반 0 |
+| 100 MHz 내부 Timing | WNS +0.283 ns, WHS +0.122 ns, TNS/THS 0 |
+| Pulse width slack | +4.500 ns, 실패 endpoint 0 |
+| 내부 제약 누락 | no_clock 0, unconstrained_internal_endpoints 0 |
+| CDC | CDC-3 Info 9개 + CDC-9 Info 1개, Warning/Critical 없음 |
+| 자원 사용량 | LUT 785/20,800 (3.77%), FF 436/41,600 (1.05%), IOB 44, BUFG 1 |
+| 프로젝트 재생성·원본 XPR 읽기 검사 | RTL 13개·TB 14개 등록 PASS, 보드 Top과 활성 XDC 확인 |
+| 보드 프로그래밍·실제 개폐/회전/청취 | 미실행 |
+
+최종 Simulation 근거는 `build/step10/20261028_135954_842384/`입니다.
+Top TB는 raw 포트만 조작하며 내부 상태·event를 force하지 않습니다.
+분수 초의 정지 보존은 1,500 tick 동안 확인했고, 완료 3,000 tick도 축소하지 않았습니다.
+Parameter를 축소한 통합 테스트와 기본 100 MHz Timing을 검사하는 기존 단위 TB를 구분합니다.
+파형은 WDB로 저장했으며 GUI 파형의 육안 검토를 완료했다는 의미는 아닙니다.
+
+최종 보드 빌드 근거는 `build/board/20261028_140007_14780/`의
+`summary.txt`, `timing_summary.rpt`, `utilization.rpt`, `route_status.rpt`,
+`cdc.rpt`, `drc.rpt`, `methodology.rpt`, `exceptions.rpt`, `microwave.bit`입니다.
+콘솔 기록은 `build/step10_board_final_console.txt`입니다.
+기존 XPR·보드에 기록하지 않는 `scripts/build_board.tcl`로 새로 생성했습니다.
+실행마다 산출물을 분리하며 Git에는 생성 프로젝트·Bitstream·대용량 파형을 포함하지 않습니다.
+
+### 경고 조사와 수정
+
+첫 빌드 `build/board/20261028_135732_12936/`에서는 LUTAR-1 Warning 1개가 발생했습니다.
+기동 대기의 `synced_reset || !ready` 조합식이 로터리 decoder의 비동기 CLR을 구동했습니다.
+해당 구조는 조합 glitch가 의도치 않은 Reset으로 작용할 가능성이 있어 그대로 두지 않았습니다.
+`rotary_decoder.enable`을 추가하고 `ready`를 동기식 기동 대기 입력으로 연결했습니다.
+비동기 Reset은 `synced_reset`만 연결하며 enable 해제 시 누적량·seed·이벤트를 초기화합니다.
+기존 2전이 단위 인스턴스도 enable을 명시했습니다. 전체 회귀와 재빌드 후 LUTAR-1은 0개입니다.
+
+최종 합성의 Synth 8-6014는 `PassiveBuzzer=0`에서 사용하지 않는 톤 카운터/FF 제거입니다.
+Synth 8-7129는 모터의 필드 선택 비트와 가열 제어의 속도 비트를 사용하지 않는다는 경고입니다.
+버튼은 Top에서 각 소비 모듈로 연결되며, 모터가 속도 비트를 처리하는 것을 통합 TB로 확인했습니다.
+이 경고를 숨기기 위한 설정이나 불필요한 dummy 로직은 추가하지 않았습니다.
+
+최종 Methodology에는 TIMING-18 Warning 32개가 남습니다. LED/FND/서보/부저/모터 출력에
+외부 동기 수신기의 output delay 요구를 정의하지 않았기 때문입니다. 상수 LOW인 IN2는 제외됩니다.
+비동기 보드 입력 10개는 input arrival false path로 보고되며, CDC 보고서에서 9개의 2단 입력
+동기화기와 1개의 Reset 동기화기에만 도달하는 것을 확인했습니다. FF 간 경로는 검사합니다.
+외부 Timing 요구를 임의로 만들거나 경고를 억제하지 않았습니다.
+따라서 위 slack은 **설정한 내부 Timing 제약의 결과**이며 모든 외부 I/O Timing이나
+실제 모터·서보·부저 동작 검증을 뜻하지 않습니다.
+
+`clockInfo.txt`가 Vivado의 부수 산출물임을 확인해 루트 제외 규칙을 추가했습니다.
+이후 빌드는 출력 디렉터리에서 수행해 같은 파일도 build 안에 남깁니다.
+보드 핀·상태 LED·실기 확인 순서는 [전체 통합](integration.md)을 따릅니다.
+
 ## STEP 9 - 모터 PWM과 가열/도어 연계
 
 2026-10-28, XSim 2026.1에서 `scripts/verify_step9.py`로 기존 11개와 신규 2개 TB를

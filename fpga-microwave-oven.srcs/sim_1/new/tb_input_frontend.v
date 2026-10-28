@@ -44,7 +44,7 @@ module tb_input_frontend;
   integer cw_two_count = 0;
   integer ccw_two_count = 0;
   rotary_decoder #(.StepsPerDetent(2)) u_rotary_two (
-      .clk(clk), .reset(reset), .ab(ab_two),
+      .clk(clk), .reset(reset), .enable(1'b1), .ab(ab_two),
       .cw_pulse(cw_two), .ccw_pulse(ccw_two), .invalid_pulse(invalid_two)
   );
 

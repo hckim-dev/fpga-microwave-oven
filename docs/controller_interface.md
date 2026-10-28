@@ -75,4 +75,5 @@ STEP 6의 `tb_controller_display`에서 FND 및 완료 통지를 연결해 추�
 STEP 7의 `tb_display_sound`에서 같은 종료 시간 기준의 부저도 연결해 검증했습니다.
 STEP 8의 `tb_door_control`에서 도어 FSM·서보의 닫힘 추정과 개폐 중단/재개를 연결해 검증했습니다.
 STEP 9의 `tb_motor_control`에서 모터 PWM과 실행/도어 조건을 연결해 검증했습니다.
-전체 보드 Top과 실제 Hardware는 아직 연결·검증하지 않았습니다.
+STEP 10의 `tb_top_microwave_oven`에서 실제 보드 포트부터 전체 논리 출력까지 검증했습니다.
+실제 Hardware는 미확인입니다. 연결과 시나리오는 [전체 통합](integration.md)을 따릅니다.

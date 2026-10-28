@@ -30,6 +30,7 @@
 /usage_statistics_webtalk.*
 /hs_err_pid*
 /replay_pid*
+/clockInfo.txt
 /*.xpr.bak
 
 # Python environment and caches.
