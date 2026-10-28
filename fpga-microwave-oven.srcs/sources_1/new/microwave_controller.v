@@ -35,7 +35,7 @@ module microwave_controller (
 
   // 상태 갱신을 기다리지 않고 정지 요청과 닫힘 조건으로 구동 허가 차단.
   assign run_enable = !reset && (state == RUN) && door_closed &&
-                      !w_cancel && !w_open && !w_close && !w_key;
+                      !w_cancel && !w_open && !w_close && !w_key && !w_expire;
 
   always @(posedge clk or posedge reset) begin
     if (reset) begin

@@ -1,5 +1,60 @@
 # 검증 기록
 
+## STEP 9 - 모터 PWM과 가열/도어 연계
+
+2026-10-28, XSim 2026.1에서 `scripts/verify_step9.py`로 기존 11개와 신규 2개 TB를
+실행하여 모두 PASS를 확인했습니다. 최종 근거는
+`build/step9/20261028_134733_933724/`의 열세 PASS 로그와 WDB입니다.
+
+| 완료 조건 | 실제 결과 |
+| --- | --- |
+| 기본 100 MHz·100,000클럭 주기·1 kHz PWM | 네 듀티 모두 축소 없이 PASS |
+| 30/50/70/90%의 정확한 HIGH 길이 | 각각 30,000/50,000/70,000/90,000클럭 PASS |
+| 기본 50%, 상하한 포화, 증가/감소 동시 입력 유지 | PASS |
+| HIGH 중 감소와 LOW 중 증가가 현재 펄스에 영향 없음 | PASS |
+| 주기 마지막 클럭의 요청이 다음 주기에 반영 | PASS |
+| IDLE/RUN/PAUSED 설정, DONE/상위 이벤트의 설정 차단 | PASS |
+| RUN이라도 실행 허가가 없으면 설정 차단 | PASS |
+| 정지 즉시 PWM/방향 LOW, 재개 시 새 주기 | PASS |
+| 취소 후 속도 보존, Reset 시 50% | PASS |
+| 도어 UNKNOWN/열림 상태의 실행 차단과 수동 재개 | PASS |
+| 일시정지·열기·취소·만료·Reset 정지 | PASS |
+| 만료와 속도 입력 동시 발생 시 만료 우선 | PASS |
+| STEP 4~8 회귀 | 기존 11개 TB PASS |
+| 실제 모터 회전·RPM·기동·전류·관성 | 미확인 |
+
+`tb_motor_controller`는 가열 상태·실행 허가·버튼 이벤트를 직접 공급합니다.
+축소 주기 10클럭에서 현재/다음 주기의 경계와 정지·재시작을 검사하고,
+기본 주기 100,000클럭으로 네 듀티의 모든 샘플을 비교합니다.
+관찰 신호는 `scenario`, `cook_state`, `run_enable`, `buttons`, `speed_level`, `duty`,
+`pwm`, `in1/in2`, `default_pwm`, `default_duty`와 내부 적용 설정/카운터입니다.
+기본 Timing 검사는 총 400,000클럭, 약 4 ms의 Simulation이며 실측 시간이 아닙니다.
+
+`tb_motor_control`은 가열·도어·서보·모터를 연결합니다. tick 및 PWM/서보 주기와 도어
+대기만 축소하고 실제 상태·이벤트 경로를 사용합니다. 도어 미확인 시 시작 차단,
+닫은 뒤 명시적 시작, 실행/일시정지 중 속도 변경, 열기 중단·재개, 취소·만료·Reset을
+검사합니다. 만료 직전 속도 증가를 같은 클럭에 공급해 출력 차단과 설정 보존을 확인합니다.
+관찰 신호는 `scenario`, `cook_state`, `door_state`, `remaining_seconds`, `run_enable`,
+`speed_level`, `duty`, `pwm`, `in1/in2`, `servo_pwm`입니다. 전체 Integration은 아직 아닙니다.
+
+### 만료/속도 동시 입력 회귀
+
+기존 실행 허가는 DONE 상태 갱신 뒤에 내려가므로, 만료와 속도 입력이 같은 클럭이면
+이전 RUN 상태를 보고 다음 속도 설정이 변경될 수 있었습니다.
+현재 테스트와 수정 전 가열 RTL을 build 아래 별도 복사본에서 실행해
+`expiration must gate run before state update` 실패를 확인했습니다.
+근거는 `build/step9_timeout_regression_before_fix/simulate.txt`입니다.
+
+실행 허가에 현재 만료 조건을 포함하고, 모터 설정도 RUN의 실행 허가 조건을 따르도록
+수정했습니다. FSM·포트·승인된 우선순위는 바꾸지 않았습니다.
+같은 회귀 검사가 수정 후 PASS이며 전체 이전 테스트도 통과했습니다.
+
+최종 컴파일·elaboration·Simulation 로그에는 경고·오류가 없습니다.
+XDC와 결선은 변경하지 않았으며 실제 모터 RPM이나 정지 거리를 이 결과로 보장하지 않습니다.
+재생성 Tcl도 Vivado에서 실행해 RTL 12개·TB 13개 프로젝트와 compile order를 확인했습니다.
+원본 XPR의 기존 Top은 유지하고 파일 참조 26개와 문서 링크를 검사했습니다.
+합성·Implementation·Timing·Bitstream·보드 실행은 이번 단계에서 수행하지 않았습니다.
+
 ## STEP 8 - 서보·도어 제어
 
 2026-10-28, XSim 2026.1에서 `scripts/verify_step8.py`로 기존 8개와 신규 3개 TB를
