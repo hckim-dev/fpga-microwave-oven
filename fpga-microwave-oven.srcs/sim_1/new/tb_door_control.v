@@ -131,7 +131,7 @@ module tb_door_control;
     wait_cycles(3);
     reset = 0;
     wait_cycles(3);
-    scenario = 1;
+    scenario  = 1;
     rotary_cw = 1;
     wait_cycles(1);
     rotary_cw = 0;
@@ -147,7 +147,7 @@ module tb_door_control;
     wait_cycles(300);
     if (cook_state !== 1 || !run_enable) $fatal(1, "start after inferred close");
 
-    scenario = 2;
+    scenario   = 2;
     saved_time = remaining_seconds;
     press(7'b1010000);
     if (cook_state !== 2 || run_enable || door_state !== 2 || opens != 1)
@@ -189,7 +189,7 @@ module tb_door_control;
     press(7'b0110000);
     if (opens != saved_opens + 1 || closes != saved_closes || door_state !== 2)
       $fatal(1, "simultaneous open/close acceptance");
-    saved_opens = opens;
+    saved_opens  = opens;
     saved_closes = closes;
     press(7'b0111000);
     if (door_state !== 0 || opens != saved_opens || closes != saved_closes)

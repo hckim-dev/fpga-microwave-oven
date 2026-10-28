@@ -14,7 +14,7 @@ module motor_controller #(
     output wire motor_in1,
     output wire motor_in2
 );
-  localparam integer CountWidth = $clog2(PwmPeriodClocks);
+  localparam integer CountWidth  = $clog2(PwmPeriodClocks);
   localparam integer TenthClocks = PwmPeriodClocks / 10;
   reg [CountWidth-1:0] r_pwm_count;
   reg [1:0] r_applied_level;

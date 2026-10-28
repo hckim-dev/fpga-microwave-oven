@@ -11,6 +11,9 @@ foreach {fileset required_names} {
     sources_1 {reset_synchronizer tick_generator btn_debouncer rotary_decoder input_frontend microwave_controller fnd_scanner display_controller sound_controller servo_controller door_controller motor_controller top_microwave_oven}
     sim_1 {tb_input_frontend tb_timebase tb_microwave_controller tb_input_controller tb_display_controller tb_controller_display tb_sound_controller tb_display_sound tb_servo_controller tb_door_controller tb_door_control tb_motor_controller tb_motor_control tb_top_microwave_oven}
 } {
+    if {$fileset eq "sources_1" && [get_property TOP [get_filesets $fileset]] ne "top_microwave_oven"} {
+        error "Board Design Top must be top_microwave_oven"
+    }
     if {[get_property TOP [get_filesets $fileset]] ni $required_names} {
         error "Top is not one of the registered STEP 4..10 modules for $fileset"
     }

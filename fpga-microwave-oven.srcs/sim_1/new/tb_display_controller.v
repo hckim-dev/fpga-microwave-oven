@@ -69,9 +69,9 @@ module tb_display_controller;
         if (blank_clocks < 2 || seg !== prev_seg) $fatal(1, "scan blank/settle interval");
       end else if (an !== prev_an) $fatal(1, "digit changed without blank interval");
       blank_clocks = 0;
-      scan_checks = scan_checks + 1;
+      scan_checks  = scan_checks + 1;
     end
-    prev_an = an;
+    prev_an  = an;
     prev_seg = seg;
   end
 
@@ -251,7 +251,7 @@ module tb_display_controller;
       check_frame(expected_time(value));
     end
 
-    scenario = 7;
+    scenario  = 7;
     state_min = 3;
     settle_mode();
     advance_ms(5);

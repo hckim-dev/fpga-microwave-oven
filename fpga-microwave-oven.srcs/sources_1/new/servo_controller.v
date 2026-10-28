@@ -5,12 +5,12 @@ module servo_controller #(
     parameter integer ClosedPulseClocks = 100_000,
     parameter integer OpenPulseClocks = 150_000
 ) (
-    input wire clk,
-    input wire reset,
-    input wire enable,
-    input wire target_open,
+    input  wire clk,
+    input  wire reset,
+    input  wire enable,
+    input  wire target_open,
     output wire servo_pwm,
-    output reg command_applied
+    output reg  command_applied
 );
   localparam integer FrameWidth = (FrameClocks > 1) ? $clog2(FrameClocks) : 1;
   reg [FrameWidth-1:0] r_frame_count;

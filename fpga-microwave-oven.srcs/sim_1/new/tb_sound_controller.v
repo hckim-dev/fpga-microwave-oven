@@ -36,7 +36,7 @@ module tb_sound_controller;
   );
 
   sound_controller #(
-      .PassiveBuzzer(1),
+      .PassiveBuzzer (1),
       .ToneHalfClocks(2)
   ) u_passive (
       .clk(clk),
@@ -99,7 +99,7 @@ module tb_sound_controller;
     end else begin
       if (dut.r_beep_phase == 1 && prev_phase != 1) begin
         beep_starts = beep_starts + 1;
-        beep_ticks = 0;
+        beep_ticks  = 0;
       end
       if (dut.r_beep_phase == 1 && tick_1ms) beep_ticks = beep_ticks + 1;
       if (dut.r_beep_phase != 1 && prev_phase == 1) begin

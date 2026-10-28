@@ -23,9 +23,9 @@ module door_controller #(
   reg r_waiting_command;
   wire w_moving = (state == OPENING) || (state == CLOSING);
 
-  assign door_closed = !reset && (state == CLOSED) && !open_request;
+  assign door_closed  = !reset && (state == CLOSED) && !open_request;
   assign servo_enable = !reset && (state != UNKNOWN) && !(cancel && w_moving);
-  assign target_open = (state == OPENING) || (state == OPEN);
+  assign target_open  = (state == OPENING) || (state == OPEN);
 
   always @(posedge clk or posedge reset) begin
     if (reset) begin
@@ -35,7 +35,7 @@ module door_controller #(
       open_event <= 0;
       close_event <= 0;
     end else begin
-      open_event <= 0;
+      open_event  <= 0;
       close_event <= 0;
       if (cancel) begin
         if (w_moving) state <= UNKNOWN;

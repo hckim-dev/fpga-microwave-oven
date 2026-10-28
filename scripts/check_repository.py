@@ -24,6 +24,11 @@ def main():
         require(modules == [path.stem], f"File/module name mismatch: {path.name}")
 
     project = ET.parse(root / "fpga-microwave-oven.xpr")
+    part = project.find('.//Configuration/Option[@Name="Part"]')
+    require(
+        part is not None and part.get("Val") == "xc7a35tcpg236-1",
+        "Unexpected FPGA part",
+    )
     registered = {}
     for fileset in project.findall(".//FileSet"):
         paths = []
@@ -49,11 +54,19 @@ def main():
             option is not None and option.get("Val") in {p.stem for p in names},
             f"Invalid selected Top: {fileset}",
         )
+        if fileset == "sources_1":
+            require(option.get("Val") == "top_microwave_oven", "Board Design Top mismatch")
 
+    # 주석으로 비활성화한 제약을 실제 핀·클럭 배정으로 세지 않는다.
+    active_xdc = "\n".join(
+        line for line in xdc.read_text(encoding="utf-8").splitlines()
+        if not line.lstrip().startswith("#")
+    )
     pins = re.findall(
         r"PACKAGE_PIN (\w+) IOSTANDARD LVCMOS33\}\s+\[get_ports \{([^}]+)\}\]",
-        xdc.read_text(encoding="utf-8"),
+        active_xdc,
     )
+    require(bool(pins), "Active pin assignments missing")
     require(len(pins) == len({pin for pin, _ in pins}), "Duplicate package pin")
     require(len(pins) == len({port for _, port in pins}), "Duplicate XDC port")
     top = (source_root / "sources_1/new/top_microwave_oven.v").read_text(
@@ -68,6 +81,14 @@ def main():
         else:
             ports.add(name)
     require({port for _, port in pins} == ports, "Top/XDC port coverage mismatch")
+    clocks = re.findall(r"(?m)^\s*create_clock\b[^\n]*", active_xdc)
+    require(len(clocks) == 1, "Expected exactly one active board clock")
+    clock = re.fullmatch(
+        r"\s*create_clock\s+-name\s+sys_clk\s+-period\s+(\d+(?:\.\d+)?)"
+        r"\s+\[get_ports\s+\{?clk\}?\]\s*",
+        clocks[0],
+    )
+    require(clock is not None and float(clock.group(1)) == 10.0, "Board clock must be 100 MHz")
     master = (
         source_root / "constrs_1/imports/digilent-xdc-master/Basys-3-Master.xdc"
     ).read_text(encoding="utf-8")
@@ -118,7 +139,7 @@ def main():
     require(ignored.returncode in (0, 1), "git check-ignore failed")
     require(not ignored.stdout, "Ignored generated/local files are tracked")
     print(
-        f"PASS: {len(rtl)} RTL, {len(tests)} TB, XPR sources/Top, {len(pins)} pins, "
+        f"PASS: {len(rtl)} RTL, {len(tests)} TB, FPGA part/board Top, {len(pins)} pins, 100 MHz clock, "
         "Python syntax, local links, Git exclusions"
     )
 

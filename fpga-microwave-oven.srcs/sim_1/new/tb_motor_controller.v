@@ -2,8 +2,8 @@
 
 module tb_motor_controller;
   reg clk = 0, reset = 1, run_enable = 0;
-  reg [1:0] cook_state = 0;
-  reg [6:0] buttons = 0;
+  reg  [1:0] cook_state = 0;
+  reg  [6:0] buttons = 0;
   wire [1:0] speed_level;
   wire [6:0] duty;
   wire pwm, in1, in2;
@@ -181,7 +181,7 @@ module tb_motor_controller;
     for (level = 0; level < 4; level = level + 1) begin
       if (default_duty !== 30 + level * 20) $fatal(1, "default duty setting");
       default_state = 1;
-      default_run = 1;
+      default_run   = 1;
       cycle();
       highs = 0;
       for (i = 0; i < 100_000; i = i + 1) begin

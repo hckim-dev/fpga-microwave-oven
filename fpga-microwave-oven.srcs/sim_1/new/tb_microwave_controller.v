@@ -74,10 +74,10 @@ module tb_microwave_controller;
     integer n;
     begin
       for (n = 0; n < count; n = n + 1) begin
-        rotary_cw = clockwise;
+        rotary_cw  = clockwise;
         rotary_ccw = !clockwise;
         cycle();
-        rotary_cw = 0;
+        rotary_cw  = 0;
         rotary_ccw = 0;
         cycle();
       end
@@ -145,15 +145,15 @@ module tb_microwave_controller;
     turn(0, 60);
     expect_value(IDLE, 0, 0, "seconds lower saturation without borrow");
 
-    scenario = 3;
+    scenario  = 3;
     rotary_cw = 1;
     press(FIELD);
     rotary_cw = 0;
     expect_value(IDLE, 0, 1, "field over rotary priority");
-    rotary_cw = 1;
+    rotary_cw  = 1;
     rotary_ccw = 1;
     cycle();
-    rotary_cw = 0;
+    rotary_cw  = 0;
     rotary_ccw = 0;
     expect_value(IDLE, 0, 1, "opposing rotary ignored");
     turn(1, 1);

@@ -17,9 +17,9 @@ module tb_timebase;
   );
 
   tick_generator u_tick (
-      .clk(clk),
+      .clk  (clk),
       .reset(reset),
-      .tick(tick)
+      .tick (tick)
   );
 
   btn_debouncer u_debounce (

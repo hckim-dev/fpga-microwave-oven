@@ -78,10 +78,10 @@ module tb_door_controller;
   task request;
     input want_open, want_close;
     begin
-      open_request = want_open;
+      open_request  = want_open;
       close_request = want_close;
       cycle();
-      open_request = 0;
+      open_request  = 0;
       close_request = 0;
     end
   endtask
@@ -107,10 +107,10 @@ module tb_door_controller;
     advance_ms(1000);
     if (state !== CLOSING || dut.r_move_count != 0 || close_event)
       $fatal(1, "move wait began before servo applied command");
-    applied = 1;
+    applied  = 1;
     tick_1ms = 1;
     cycle();
-    applied = 0;
+    applied  = 0;
     tick_1ms = 0;
     if (dut.r_move_count != 0) $fatal(1, "apply edge consumed move tick");
     advance_ms(499);
@@ -130,20 +130,20 @@ module tb_door_controller;
     applied = 0;
     close_request = 0;
     if (dut.r_waiting_command || close_event) $fatal(1, "ignored request swallowed acknowledgment");
-    open_request = 1;
+    open_request  = 1;
     close_request = 1;
     advance_ms(499);
-    open_request = 0;
+    open_request  = 0;
     close_request = 0;
     if (state !== OPENING || open_event || close_event)
       $fatal(1, "moving requests restarted/blocked timer");
     tick_1ms = 1;
-    cancel = 1;
+    cancel   = 1;
     #1;
     if (servo_enable) $fatal(1, "cancel must immediately disable moving servo");
     cycle();
     tick_1ms = 0;
-    cancel = 0;
+    cancel   = 0;
     if (state !== UNKNOWN || servo_enable || open_event || close_event)
       $fatal(1, "cancel over movement completion");
 
@@ -176,7 +176,7 @@ module tb_door_controller;
     if (state !== UNKNOWN || servo_enable || open_event || close_event)
       $fatal(1, "cancel while waiting for servo acknowledgment");
 
-    scenario = 4;
+    scenario  = 4;
     min_close = 1;
     cycle();
     min_close = 0;

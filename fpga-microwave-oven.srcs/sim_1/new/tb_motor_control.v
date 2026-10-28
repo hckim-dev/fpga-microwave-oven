@@ -7,9 +7,9 @@ module tb_motor_control;
   reg [6:0] buttons = 0;
   reg rotary_cw = 0;
   wire [1:0] cook_state, speed_level;
-  wire [2:0] door_state;
+  wire [ 2:0] door_state;
   wire [11:0] remaining_seconds;
-  wire [6:0] duty;
+  wire [ 6:0] duty;
   wire select_minutes, run_enable, timeout_pulse;
   wire door_closed, servo_enable, target_open, servo_pwm, applied, open_event, close_event;
   wire pwm, in1, in2;
@@ -183,7 +183,7 @@ module tb_motor_control;
     if (cook_state !== 0 || remaining_seconds !== 0 || pwm || in1 || duty !== 70)
       $fatal(1, "cancel stop and retained speed");
 
-    scenario = 3;
+    scenario  = 3;
     rotary_cw = 1;
     wait_cycles(1);
     rotary_cw = 0;

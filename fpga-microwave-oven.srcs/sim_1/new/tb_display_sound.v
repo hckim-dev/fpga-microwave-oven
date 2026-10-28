@@ -7,7 +7,7 @@ module tb_display_sound;
   reg [6:0] buttons = 0;
   reg rotary_cw = 0;
   reg open_event = 0, close_event = 0;
-  wire [1:0] state;
+  wire [ 1:0] state;
   wire [11:0] remaining_seconds;
   wire select_minutes, run_enable, timeout_pulse;
   wire alert_done, alert_on;

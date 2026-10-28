@@ -9,7 +9,7 @@ PDF의 기능 요구와 예시를 구분합니다. STEP 10은 기본 기능의 T
 | R03 | 버튼마다 BEEP | `input_frontend.v`, `sound_controller.v` | 입력·부저 TB PASS: 동시/연속 요청 보존, ON/OFF 길이, 큐 초과 표시 | 개별 결과 미기록 | STEP 4/7 로그·WDB |
 | R04 | 동작 종료 알림 | `microwave_controller.v`, `display_controller.v`, `sound_controller.v` | 연계 TB PASS: 0000 3회 점멸과 동일한 종료음 envelope, 3초 후 복귀 | 개별 결과 미기록 | STEP 5/6/7 로그·WDB |
 | R05 | 동작 표시 | `display_controller.v`, `fnd_scanner.v` | 표시 TB PASS: 3,600개 시간 값, 선택 필드·일시정지·circle 교대·스캔 | 개별 결과 미기록 | STEP 6 로그·WDB |
-| R06 | 취소 | 시간·표시·소리·도어 이동 취소, 서보/모터 출력 차단 | 제어·표시·부저·도어·모터 및 Top TB PASS: 실제 입력 경로 취소·동시 요청 우선순위·출력 차단 | 개별 결과 미기록 | STEP 5~10 로그·WDB |
+| R06 | 취소 | 시간 초기화·모터 차단, 이동 중 서보 차단·안정 위치 유지, 취소 BEEP | 제어·표시·부저·도어·모터 및 Top TB PASS: 실제 입력 경로 취소·동시 요청 우선순위·출력 차단 | 개별 결과 미기록 | STEP 5~10 로그·WDB |
 | R07 | 서보로 문 개폐 | `door_controller.v`, `servo_controller.v` | 서보·도어·연계 TB PASS: 프레임/폭, 명령 적용, 대기/개폐 추정과 가열 차단 | 개별 결과 미기록 | STEP 8 로그·WDB, 실제 개폐는 미확보 |
 | R08 | 모터 PWM 속도 제어 | `motor_controller.v`, 가열 제어 실행 허가 | 모터/연계 TB PASS: 1 kHz·30/50/70/90%, 경계 반영, 정지·재개·만료 우선 | 개별 결과 미기록 | STEP 9 로그·WDB, 실제 RPM/회전은 미확보 |
 | R09 | 자체 아이디어 | 기본 기능 안정화 후 선정 | 미실행 | 개별 결과 미기록 | 미확보 |

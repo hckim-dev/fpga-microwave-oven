@@ -104,8 +104,8 @@ module sound_controller #(
       queue_overflow <= 0;
     end else begin
       r_pending_beeps <= w_pending_next;
-      r_effect_queue <= w_effect_queue_next;
-      r_effect_count <= w_effect_count_next;
+      r_effect_queue  <= w_effect_queue_next;
+      r_effect_count  <= w_effect_count_next;
       if (w_overflow) queue_overflow <= 1;
 
       case (r_beep_phase)
@@ -141,7 +141,7 @@ module sound_controller #(
         if (r_effect_ms == DoorStepMs - 1) begin
           r_effect_ms <= 0;
           if (r_effect_step == 2) begin
-            r_effect_step <= 0;
+            r_effect_step   <= 0;
             r_effect_active <= 0;
           end else r_effect_step <= r_effect_step + 1'b1;
         end else r_effect_ms <= r_effect_ms + 1'b1;

@@ -72,7 +72,7 @@ module display_controller #(
       r_done_phase <= 0;
       r_finished <= 0;
     end else begin
-      r_prev_state <= state;
+      r_prev_state  <= state;
       r_prev_select <= select_minutes;
       if ((state != r_prev_state) || ((state == IDLE) && (select_minutes != r_prev_select))) begin
         r_blink_count <= 0;
@@ -94,7 +94,7 @@ module display_controller #(
           RUN: begin
             if (r_screen_count == ScreenPeriodMs - 1) begin
               r_screen_count <= 0;
-              r_show_circle <= !r_show_circle;
+              r_show_circle  <= !r_show_circle;
             end else r_screen_count <= r_screen_count + 1'b1;
             if (r_circle_count == CircleStepMs - 1) begin
               r_circle_count <= 0;
@@ -121,7 +121,7 @@ module display_controller #(
 
   // 제어부가 DONE을 떠날 때까지 유지하여 높은 우선순위 이벤트와 겹쳐도 보존.
   assign alert_done = !reset && (state == DONE) && r_finished;
-  assign alert_on = !reset && (state == DONE) && !r_done_phase[0] && !r_finished;
+  assign alert_on   = !reset && (state == DONE) && !r_done_phase[0] && !r_finished;
 
   always @(*) begin
     case (r_circle_step)

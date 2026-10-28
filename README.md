@@ -17,7 +17,8 @@ Basys3에서 시간 설정, 도어 서보, 모터 PWM, 표시와 효과음을 �
 | `fpga-microwave-oven.srcs/sources_1/new/` | RTL 13개: 보드 Top과 입력·시간·표시·부저·도어·모터 |
 | `fpga-microwave-oven.srcs/sim_1/new/` | 자동 판정 Testbench 14개 |
 | `scripts/verify_step10.py` | 현재 14개 TB 실행 및 로그·Waveform 저장 |
-| `scripts/check_repository.py` | 파일·모듈명, XPR, 핀, 문서 링크·Git 제외 검사 |
+| `scripts/check_repository.py` | FPGA Part·보드 Top·활성 핀/클럭·파일·문서·Git 검사 |
+| `scripts/test_repository_checks.py` | 정상 설정과 잘못된 설정의 회귀 검사 9개 |
 | `scripts/build_board.tcl` | 합성·배치배선·내부 Timing 검사·Bitstream 생성 |
 | `scripts/verify_step9.py` | 이전 13개 TB 실행 |
 | `scripts/verify_step8.py` | 이전 입력·시간·표시·부저·도어 11개 TB 실행 |
@@ -45,12 +46,14 @@ Python 3과 Vivado XSim이 필요합니다. 저장소 루트에서 실행합니�
 
 ```powershell
 python scripts/check_repository.py
+python scripts/test_repository_checks.py
 python scripts/verify_step10.py --vivado-bin "C:/AMDDesignTools/2026.1/Vivado/bin"
 ```
 
 경로는 본인의 설치 위치로 바꾸세요. `VIVADO_BIN` 환경 변수 또는 PATH도 지원합니다.
 실행은 XPR을 열거나 변경하지 않으며 결과는 `build/step10/<실행시각>/`에 저장됩니다.
-열네 Simulation의 `PASS:` 확인과 오류 검출을 모두 통과해야 성공으로 판정합니다.
+저장소 검사 PASS, Python 회귀 검사 9개 OK, 열네 Simulation PASS를 각각 확인합니다.
+각 명령이 오류 없이 끝나야 전체 검증 성공으로 판정합니다.
 기본 서보 Timing 검사만 약 40 ms의 Simulation 시간을 실행하며, 해당 WDB는 고속 내부
 카운터 대신 외부 펄스·제어 신호를 기록합니다.
 `build/`는 Git 추적 대상에서 제외합니다.
@@ -60,6 +63,7 @@ python scripts/verify_step10.py --vivado-bin "C:/AMDDesignTools/2026.1/Vivado/bi
 기존 `fpga-microwave-oven.xpr`의 Design Top은 `top_microwave_oven`, Simulation Top은
 `tb_top_microwave_oven`으로 변경했습니다. 열려 있던 Vivado에서는 프로젝트를 다시 여세요.
 Run Behavioral Simulation → Run All → `PASS:`를 확인합니다.
+보드 Design Top은 `top_microwave_oven`으로 유지하고 Simulation Top만 단위 TB로 바꿀 수 있습니다.
 Top 테스트는 실제 버튼·로터리 포트를 구동하며 내부 이벤트를 강제 주입하지 않습니다.
 
 새 경로에서 프로젝트를 재현하려면 Vivado Tcl Console에서 실행합니다.

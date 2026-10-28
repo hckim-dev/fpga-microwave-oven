@@ -20,7 +20,7 @@ module rotary_decoder #(
 
   // CW 전이 순서: {S1,S2} = 00 -> 10 -> 11 -> 01 -> 00.
   always @(*) begin
-    w_delta = 0;
+    w_delta   = 0;
     w_invalid = 0;
     case ({
       r_prev_ab, ab
@@ -50,7 +50,7 @@ module rotary_decoder #(
       // 초기 위상을 먼저 저장하여 Reset 해제 자체를 회전으로 세지 않음.
       if (!enable) begin
         r_seeded <= 0;
-        r_steps <= 0;
+        r_steps  <= 0;
       end else if (!r_seeded) begin
         r_steps <= 0;
       end else if (w_invalid) begin
@@ -58,12 +58,12 @@ module rotary_decoder #(
         invalid_pulse <= 1;
       end else if (w_delta == 1) begin
         if (r_steps == StepsPerDetent - 1) begin
-          r_steps <= 0;
+          r_steps  <= 0;
           cw_pulse <= 1;
         end else r_steps <= r_steps + 1'b1;
       end else if (w_delta == -1) begin
         if (r_steps == -(StepsPerDetent - 1)) begin
-          r_steps <= 0;
+          r_steps   <= 0;
           ccw_pulse <= 1;
         end else r_steps <= r_steps - 1'b1;
       end

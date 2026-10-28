@@ -15,7 +15,7 @@ module tb_top_microwave_oven;
   integer pulse_count = 0, open_count = 0, close_count = 0;
   integer done_ticks = 0, timeout_count = 0;
   reg [11:0] saved_time;
-  reg [9:0] saved_fraction;
+  reg [ 9:0] saved_fraction;
 
   top_microwave_oven #(
       .TickCount(10),

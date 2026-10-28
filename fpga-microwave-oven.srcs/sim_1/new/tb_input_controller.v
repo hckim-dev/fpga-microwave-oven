@@ -9,7 +9,7 @@ module tb_input_controller;
   wire synced_reset, tick_1ms, ready;
   wire [6:0] button_down, button_pulse;
   wire cw, ccw, invalid;
-  wire [1:0] state;
+  wire [ 1:0] state;
   wire [11:0] remaining_seconds;
   wire select_minutes, run_enable, timeout_pulse;
   integer timeout_count = 0;

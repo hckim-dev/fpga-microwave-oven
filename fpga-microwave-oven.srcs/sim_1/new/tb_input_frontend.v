@@ -46,9 +46,9 @@ module tb_input_frontend;
   tick_generator #(
       .TickCount(1)
   ) u_tick_one (
-      .clk(clk),
+      .clk  (clk),
       .reset(reset),
-      .tick(tick_one)
+      .tick (tick_one)
   );
 
   btn_debouncer #(
@@ -81,7 +81,7 @@ module tb_input_frontend;
   // 실제 소비 모듈과 같이 posedge에서 이벤트를 샘플링.
   always @(posedge clk) begin
     if (reset) begin
-      cw_two_count = 0;
+      cw_two_count  = 0;
       ccw_two_count = 0;
     end else begin
       if (cw_two) cw_two_count = cw_two_count + 1;
@@ -95,7 +95,7 @@ module tb_input_frontend;
       cycles = cycles + 1;
       if (tick_1ms) begin
         if (last_tick >= 0 && cycles - last_tick != 5) $fatal(1, "tick interval");
-        last_tick = cycles;
+        last_tick  = cycles;
         tick_count = tick_count + 1;
       end
       if ((button_pulse & prev_pulse) != 0) $fatal(1, "button pulse wider than one clock");
@@ -185,7 +185,7 @@ module tb_input_frontend;
       if (button_count[i] != 1 || button_down[i] !== 0) $fatal(1, "release bounce: %0d", i);
     end
 
-    scenario = 3;
+    scenario   = 3;
     button_raw = 7'b0111111;
     wait_cycles(12);
     if (button_down !== 7'b1111111) $fatal(1, "simultaneous levels");
@@ -228,7 +228,7 @@ module tb_input_frontend;
     set_ab(2'b11);
 
     scenario = 6;
-    ab_two = 2'b10;
+    ab_two   = 2'b10;
     wait_cycles(2);
     ab_two = 2'b11;
     wait_cycles(2);

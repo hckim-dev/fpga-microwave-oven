@@ -1,8 +1,8 @@
 `timescale 1ns / 1ps
 
 module reset_synchronizer (
-    input wire clk,
-    input wire reset,
+    input  wire clk,
+    input  wire reset,
     output wire synced_reset
 );
   // FPGA 구성 직후 초기화, 비동기 인가 및 동기 해제.
