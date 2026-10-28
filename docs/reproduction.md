@@ -22,7 +22,6 @@ python scripts/verify_step11.py --vivado-bin "C:/AMDDesignTools/2026.1/Vivado/bi
 `VIVADO_BIN` 환경 변수와 PATH도 지원합니다. `build/step11/<실행시각>/`에 compile·elaboration·
 Simulation 로그와 WDB를 저장하며, 16개 TB 모두 PASS가 있어야 성공입니다.
 기본 서보 Timing TB는 40 ms를 Simulation하고 외부 신호 위주로 WDB를 기록합니다.
-이전 `verify_step4.py`~`verify_step10.py`는 단계별 회귀 범위를 실행합니다.
 
 ## 새 Vivado 프로젝트
 
@@ -54,7 +53,7 @@ New-Item -ItemType Directory -Force build
 자동 프로그래밍하지 않습니다. 내부 setup/hold, 클럭 펄스 폭과 내부 제약 누락을 검사합니다.
 `summary.txt`, `timing_summary.rpt`, `check_timing.rpt`, `pulse_width.rpt`, `drc.rpt`,
 `cdc.rpt`, `methodology.rpt`를 함께 확인합니다. 외부 출력의 동기 Timing 요구 미정의 경고는
-내부 Timing 검사와 구분하며 [검증 근거](evidence/README.md)에 기록했습니다.
+내부 Timing 검사와 구분하며 [검증 결과](verification.md)에 기록했습니다.
 
 ## Git 범위
 
@@ -62,5 +61,26 @@ RTL·TB·XDC·XPR·스크립트·문서를 관리합니다. 생성 프로젝트�
 Bitstream은 `build/` 등에 보존하고 추적하지 않습니다. 선별한 문서용 PNG·SVG·짧은 VCD·
 수치 요약은 `docs/evidence/`에서 관리합니다. `.wcfg`, `.mem`, `.coe`는 일괄 제외하지 않습니다.
 
-대표 파형의 VCD 추출과 이미지 생성은 [파형 재생성](evidence/README.md)을 따릅니다.
-Matplotlib은 문서 이미지 재생성에만 필요하며 위의 RTL 검증·보드 빌드에는 필요하지 않습니다.
+## 파형 재생성
+
+먼저 전체 Simulation을 실행합니다. 아래 `$simDir`는 실행 결과 경로로 바꿉니다.
+
+```powershell
+$repoRoot = (Get-Location).Path
+$vivadoBin = "C:/AMDDesignTools/2026.1/Vivado/bin"
+$simDir = "$repoRoot/build/step11/<실행시각>"
+$env:LOCK_VCD_PATH = "$repoRoot/build/control_lock_full.vcd"
+Push-Location $simDir
+& "$vivadoBin/xsim.bat" tb_top_control_lock -tclbatch "$repoRoot/scripts/export_lock_waveform.tcl" -wdb "$repoRoot/build/control_lock_export.wdb"
+Pop-Location
+python scripts/render_lock_waveform.py build/control_lock_full.vcd --output-dir docs/evidence
+```
+
+XSim의 PASS와 오류 여부를 확인한 뒤 이미지를 생성합니다. 이미지 생성에는 Matplotlib이
+필요하며 확인한 버전은 3.11.1입니다. 이 패키지는 RTL 검증의 의존성이 아닙니다.
+전체 VCD는 build에 보존하고 선택 구간·PNG·SVG·해시만 docs에 저장합니다.
+기록된 120 ns VCD만으로 다시 그릴 때는 원본 덮어쓰기를 피하도록 다른 출력 폴더를 사용합니다.
+
+```powershell
+python scripts/render_lock_waveform.py docs/evidence/control_lock_boundary.vcd --output-dir build/waveform_preview
+```

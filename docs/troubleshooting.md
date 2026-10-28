@@ -12,7 +12,7 @@
 | 확인 | 수정 전 RTL로 expiration must gate run before state update 실패 재현 |
 | 수정 | 실행 허가에 현재 만료 조건 포함, RUN의 속도 변경도 실행 허가 조건을 따름 |
 | 결과 | 만료와 속도 입력 동시 회귀 및 전체 이전 TB PASS |
-| 근거 | tb_motor_control, [검증 기록](verification.md)의 STEP 9 |
+| 근거 | tb_motor_control · 수정 전 로그: build/step9_timeout_regression_before_fix/simulate.txt |
 
 상태 레지스터가 다음 클럭에 바뀐다는 사실만으로 같은 클럭의 다른 소비 모듈까지
 정지 우선순위가 전달되지는 않습니다. 공유 실행 허가의 조건을 소비 경로와 함께 확인했습니다.
@@ -26,7 +26,7 @@
 | 확인 | 보고서가 조합 LUT의 비동기 Reset 경로와 glitch 가능성을 지적 |
 | 수정 | 비동기 Reset은 synced_reset만 사용, 기동 대기는 동기식 enable로 분리 |
 | 결과 | 전체 회귀 PASS, 재빌드 후 LUTAR-1 없음 |
-| 근거 | rotary_decoder·input_frontend, [검증 기록](verification.md)의 STEP 10 |
+| 근거 | rotary_decoder·input_frontend · 수정 전 보고서: build/board/20261028_135732_12936/methodology.rpt |
 
 실제 보드 glitch를 관찰한 사례로 표현하지 않습니다. Simulation이 통과한 구조도
 합성·Methodology에서 확인할 문제가 있을 수 있다는 점을 확인했습니다.
@@ -40,10 +40,10 @@
 | 확인 | raw 포트를 함께 바꾸는 Top TB에서 simultaneous unlock and KEY must not start 실패 |
 | 수정 | 이전 잠금 상태를 한 클럭 보존해 해제 경계의 시작·재개·설정 차단 |
 | 결과 | 동일 회귀·잠금 단위 경계·기존 기능을 포함한 16개 TB PASS |
-| 근거 | control_lock·tb_top_control_lock, [실제 VCD 파형](evidence/control_lock_boundary.png) |
+| 근거 | control_lock·tb_top_control_lock · 수정 전 로그: build/step11_unlock_boundary_before_fix/simulate.txt |
 
-[파형과 원본 데이터](evidence/README.md)의 노란 구간에서는 KEY pulse가 1이어도
+[파형과 원본 데이터](verification.md)의 노란 구간에서는 KEY pulse가 1이어도
 previous locked가 남아 KEY to controller는 0입니다. 가열 상태는 IDLE을 유지합니다.
 정지·취소·문 개폐·종료 확인에는 추가 차단을 적용하지 않았습니다.
 
-모든 사례의 단계별 로그 위치와 수정 전 재현 근거는 [전체 검증 기록](verification.md)에 보존했습니다.
+수정 전 로컬 로그는 Git에서 제외합니다. 현재 회귀 결과와 파형은 [검증 결과](verification.md)를 따릅니다.

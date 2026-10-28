@@ -100,5 +100,43 @@ BEEP은 도어 효과음보다 우선하며 중단한 효과음은 이어 재생
 상위 소리가 재생돼도 늘어나지 않습니다. 큐는 유한하며 초과 시 LD13으로 알립니다.
 도어 취소는 이동 중 서보를 차단하지만 안정 위치의 유지 펄스는 계속 출력합니다.
 
-상세 포트와 Parameter는 [모듈 문서 안내](README.md), 핀과 LED는 [전체 통합](integration.md),
-검증 수치와 한계는 [검증 근거](evidence/README.md)를 따릅니다.
+## 모듈별 동작 규칙
+
+| 모듈 | 핵심 규칙 |
+| --- | --- |
+| input_frontend | 버튼 비트 0→6: 필드·속도+·속도−·취소·열기·닫기·KEY. 기동 시 눌린 버튼은 놓고 다시 눌러야 이벤트 발생 |
+| rotary_decoder | CW 전이 00→10→11→01→00, 역전은 누적량 상쇄, invalid 전이는 누적량 폐기 |
+| control_lock | 준비 전에도 잠금, 실행은 계속, 설정/시작/재개만 차단. RUN 정지·DONE 확인·취소·개폐 허용 |
+| microwave_controller | 1초=1,000 tick, 남은 시간 12비트·0~3,599초. 필드별 편집은 carry/borrow 없이 포화 |
+| display_controller / fnd_scanner | MM.SS·circle 1초 교대, 점멸 반주기 500 ms. 자리 스캔 1 ms, 전환 시 2클럭 소등 |
+| sound_controller | BEEP→도어 효과음→종료음 순. BEEP 40/20 ms, 개폐 70 ms×3단계, 종료 표시와 3초 기준 공유 |
+| door_controller / servo_controller | Reset은 UNKNOWN·출력 차단, 안정 위치 취소는 유지 펄스 지속. 명령 적용 확인 뒤 이동 대기 |
+| motor_controller | 요청 듀티와 현재 주기 적용값 분리, 구동 허가 상실 시 출력 차단, 재개 시 새 주기 |
+
+BEEP은 대기 15개, 도어 효과음은 FIFO 4개까지 보존하며 각각 현재 재생 1개는 별도입니다.
+초과는 LD13으로 표시하고 Reset/취소로 해제합니다. 취소는 대기 소리를 버리고 취소 BEEP을 남깁니다.
+종료 완료 신호 `alert_done`은 DONE을 떠날 때까지 유지해 상위 이벤트와 겹쳐도 통지를 잃지 않습니다.
+
+<details>
+<summary>Top Parameter 기본값과 변경 조건</summary>
+
+기준 클럭은 100 MHz입니다. 시간 계수는 양의 정수로 설정합니다.
+
+| Parameter | 기본값·의미 |
+| --- | --- |
+| TickCount | 100,000 → 1 ms enable |
+| ButtonDebounceCount / RotaryDebounceCount | 1,000,000 / 200,000 → 10 ms / 2 ms |
+| StepsPerDetent | 4, 유효 위상 전이 누적 수 |
+| ServoFrameClocks | 2,000,000 → 20 ms, 2 이상 |
+| ClosedPulseClocks / OpenPulseClocks | 100,000 / 150,000 → 1 / 1.5 ms, 1 이상·프레임 미만 |
+| MoveTimeMs | 500 → 명령 적용 후 500 ms 대기 |
+| PwmPeriodClocks | 100,000 → 1 kHz, 10 이상의 10 배수 |
+| PassiveBuzzer | 0=ON/OFF, 1=2 kHz 반송파 사용 |
+
+서보 펄스는 기구 보정 전 초기값이며 특정 각도를 보장하지 않습니다.
+입력 필터는 2단 동기화 이후의 안정 기간을 계수합니다. 기동 대기는 큰 필터 계수+4클럭입니다.
+SW0는 버튼과 같은 계수로 필터링합니다. FND 스캔용 tick은 최소 3클럭 간격이어야 합니다.
+
+</details>
+
+핀·조작은 [하드웨어](hardware.md), 테스트와 Timing은 [검증 결과](verification.md)를 참고하세요.
