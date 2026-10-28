@@ -1,0 +1,17 @@
+{
+  "source_vcd": "control_lock_full.vcd",
+  "source_sha256": "c211cad99f6ec030693e2f1afa827ad9a87545e783b9b010c26756a3b78f64c7",
+  "crop_sha256": "1977bb5e99ffbae96c4c6dec97e64222a1090612df3da5972975c3c2802295f0",
+  "timescale_ns_per_tick": 0.001,
+  "trigger_ns": 48530.0,
+  "window_ns": [
+    48510.0,
+    48630.0
+  ],
+  "key_pulse_ns": [
+    48575.0,
+    48585.0
+  ],
+  "matplotlib_version": "3.11.1",
+  "note": "Actual XSim data, scaled debounce, not a hardware measurement."
+}

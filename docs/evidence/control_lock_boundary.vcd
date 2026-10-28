@@ -1,0 +1,94 @@
+$date
+   Wed Oct 28 15:53:45 2026
+$end
+
+$version
+  2026.1
+$end
+
+$timescale
+  1ps
+$end
+
+$scope module tb_top_control_lock $end
+$var reg 1 ! clk $end
+$var reg 1 " lock_switch $end
+$var reg 7 # buttons [6:0] $end
+$var wire 1 ) motor_pwm $end
+$scope module dut $end
+$var wire 7 & button_pulse [6:0] $end
+$var wire 7 ' control_buttons [6:0] $end
+$var wire 1 $ locked $end
+$var wire 2 ( cook_state [1:0] $end
+$scope module u_lock $end
+$var reg 1 % r_was_locked $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#48510000
+$dumpvars
+0!
+1"
+b0000000 #
+1$
+1%
+b0000000 &
+b0000000 '
+b00 (
+0)
+$end
+#48515000
+1!
+#48520000
+0!
+#48525000
+1!
+#48530000
+0!
+0"
+b1000000 #
+#48535000
+1!
+#48540000
+0!
+#48545000
+1!
+#48550000
+0!
+#48555000
+1!
+#48560000
+0!
+#48565000
+1!
+#48570000
+0!
+#48575000
+1!
+0$
+b1000000 &
+#48580000
+0!
+#48585000
+1!
+0%
+b0000000 &
+#48590000
+0!
+#48595000
+1!
+#48600000
+0!
+#48605000
+1!
+#48610000
+0!
+#48615000
+1!
+#48620000
+0!
+#48625000
+1!
+#48630000
+0!
