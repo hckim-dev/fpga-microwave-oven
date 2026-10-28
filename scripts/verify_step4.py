@@ -33,6 +33,8 @@ def main(stage=4):
     tests = ["tb_input_frontend", "tb_timebase"]
     if stage >= 5:
         tests += ["tb_microwave_controller", "tb_input_controller"]
+    if stage >= 6:
+        tests += ["tb_display_controller", "tb_controller_display"]
     sources = rtl + [test_dir / f"{name}.v" for name in tests]
     compile_args = [executables["xvlog"], *map(str, sources)]
 

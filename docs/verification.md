@@ -1,5 +1,50 @@
 # 검증 기록
 
+## STEP 6 - FND 표시
+
+2026-10-28, XSim 2026.1에서 `scripts/verify_step6.py`로 기존 4개와 신규 2개 TB를
+실행하여 모두 PASS를 확인했습니다. 최종 Simulation 근거는
+`build/step6/20261028_130517_707922/`의 여섯 PASS 로그와 WDB입니다.
+
+| 완료 조건 | 실제 결과 |
+| --- | --- |
+| 00:00~59:59의 3,600개 값, 네 자리와 DP 위치 | seg/an 출력 대조 PASS |
+| active-low 한 자리 선택과 자리 사이 2클럭 소등·패턴 선출력 | PASS |
+| 대기 중 선택 필드 점멸과 필드 전환 시 위상 초기화 | PASS |
+| 일시정지 중 숫자 유지와 구분점 점멸 | PASS |
+| 실행 중 1초마다 시간/circle 화면 교대 | PASS |
+| 100 ms마다 외곽 6개 선분 회전 | PASS |
+| 종료 시 0000의 500 ms ON/OFF 3회 | PASS |
+| 정확히 3,000 DONE tick 후 제어부의 IDLE 복귀 | PASS |
+| 도어 이벤트 우선 처리 뒤 완료 통지 재시도 | PASS |
+| 종료 표시 도중 취소·KEY 확인, 이후 오래된 완료 신호 없음 | PASS |
+| Reset 중 소등, Parameter 1의 계수 폭·종료 처리 | PASS |
+| STEP 4/5 입력·시간 제어 회귀 | 기존 4개 TB PASS |
+| 실제 밝기·잔상·보드 표시와 전체 출력 통합 | 미실행 |
+
+`tb_display_controller`는 상태·남은 초·필드 선택을 입력하고 모든 자리의 `seg/an`을
+기대 패턴과 비교합니다. 관찰할 신호는 `scenario`, `state`, `remaining_seconds`,
+`select_minutes`, `tick_1ms`, `seg`, `an`, `alert_done`입니다.
+기본 500/1,000/100 tick 경계는 유지하고, 한 tick을 5클럭 간격으로 공급합니다.
+3,600개 시간 값을 모두 대조하며 IDLE, RUN, PAUSED, DONE의 표시 정책을 별도로 검사합니다.
+
+`tb_controller_display`는 제어부와 표시부를 연결합니다. 도어 닫힘은 TB의 상수로 공급하고,
+1초 가열 만료부터 3초 종료 점멸 뒤 IDLE 복귀까지 자동 판정합니다. 완료 직후 열기 이벤트,
+종료 중 취소와 KEY 확인으로 완료 통지가 누락되거나 지연 발생하지 않는지 검사합니다.
+관찰 신호는 `scenario`, `state`, `remaining_seconds`, `timeout_pulse`, `alert_done`,
+`done_ticks`, `seg`, `an`입니다. 이는 제어·표시 Interface 검사이며 전체 Integration은 아닙니다.
+
+최종 컴파일·elaboration·Simulation 로그에 경고·오류는 없습니다.
+WDB는 생성했지만 GUI에서 파형을 시각 검토한 결과는 아닙니다.
+XDC 및 기존 시간 제어 RTL은 변경하지 않았고 합성·Implementation·Timing·Bitstream·
+보드 다운로드는 수행하지 않았습니다. 이후 종료음은 같은 알림 시간 기준에 연계해야 합니다.
+
+Vivado에서 재생성 스크립트를 실행해 RTL 8개·TB 6개의 별도 프로젝트 생성과 compile order
+갱신도 완료했습니다. 원본 XPR의 등록 내용은 build 아래 복사본에서 읽기 전용으로 확인했습니다.
+복사본에는 사용자 생성 산출물을 옮기지 않아 IPUserFilesDir와 이전 synth_1 GeneratedRun
+파일 부재 경고가 발생했습니다. 등록된 RTL/TB와 Top 검사는 통과했으며, 이 경고를 없애기 위해
+원본 설정이나 산출물을 변경하지 않았습니다.
+
 ## STEP 5 - 시간·가열 제어
 
 2026-10-28, XSim 2026.1에서 `scripts/verify_step5.py`로 현재 TB 4개를 실행했습니다.
