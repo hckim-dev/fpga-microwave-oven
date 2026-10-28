@@ -13,6 +13,7 @@ module top_microwave_oven #(
     parameter integer PassiveBuzzer = 0
 ) (
     input wire clk,
+    input wire lock_switch,
     input wire btnC,
     input wire btnL,
     input wire btnU,
@@ -34,6 +35,8 @@ module top_microwave_oven #(
 );
   wire reset, tick_1ms, ready;
   wire [6:0] button_down, button_pulse;
+  wire [6:0] control_buttons;
+  wire control_cw, control_ccw, locked;
   wire rotary_cw, rotary_ccw, rotary_invalid;
   wire [1:0] cook_state, speed_level;
   wire [ 2:0] door_state;
@@ -64,13 +67,30 @@ module top_microwave_oven #(
       .rotary_invalid(rotary_invalid)
   );
 
+  control_lock #(
+      .DebounceCount(ButtonDebounceCount)
+  ) u_lock (
+      .clk(clk),
+      .reset(reset),
+      .lock_switch(lock_switch),
+      .inputs_ready(ready),
+      .cook_state(cook_state),
+      .button_pulse(button_pulse),
+      .rotary_cw(rotary_cw),
+      .rotary_ccw(rotary_ccw),
+      .locked(locked),
+      .control_buttons(control_buttons),
+      .control_cw(control_cw),
+      .control_ccw(control_ccw)
+  );
+
   microwave_controller u_control (
       .clk(clk),
       .reset(reset),
       .tick_1ms(tick_1ms),
-      .button_pulse(button_pulse),
-      .rotary_cw(rotary_cw),
-      .rotary_ccw(rotary_ccw),
+      .button_pulse(control_buttons),
+      .rotary_cw(control_cw),
+      .rotary_ccw(control_ccw),
       .door_closed(door_closed),
       .alert_done(alert_done),
       .state(cook_state),
@@ -118,7 +138,7 @@ module top_microwave_oven #(
       .reset(reset),
       .cook_state(cook_state),
       .run_enable(run_enable),
-      .button_pulse(button_pulse),
+      .button_pulse(control_buttons),
       .speed_level(speed_level),
       .duty_percent(duty_percent),
       .motor_pwm(motor_pwm),
@@ -170,6 +190,6 @@ module top_microwave_oven #(
   assign led[11]  = servo_enable;
   assign led[12]  = sound_active;
   assign led[13]  = !reset && queue_overflow;
-  assign led[14]  = rotary_invalid;
+  assign led[14]  = !reset && locked;
   assign led[15]  = reset;
 endmodule

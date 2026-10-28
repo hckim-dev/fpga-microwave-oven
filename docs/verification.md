@@ -1,12 +1,66 @@
 # 검증 기록
 
-## 최종 재검토
+## STEP 11 — 조작 잠금(R09)
+
+2026-10-28, Vivado/XSim 2026.1에서 SW0 조작 잠금을 구현하고 검증했습니다.
+SG90 떨림은 사용자가 자연스러운 동작으로 수용해 이슈를 종결했습니다.
+서보 구동 정책·펄스 폭·결선은 변경하지 않았으며 별도의 전기·기구 측정을 추가한 것은 아닙니다.
+
+| 확인 항목 | 실제 결과 |
+| --- | --- |
+| 기존 14개 + 신규 2개 TB | 16개 모두 PASS, 컴파일/elaboration/Simulation 경고·오류 없음 |
+| 잠금 조합 | 네 상태별 128개 버튼 조합·CW/CCW 허용 규칙 PASS |
+| SW0 입력 | 2단 동기화, 잡음, 잠금/해제 경계, 최소 계수 PASS |
+| 기동·Reset | 입력 준비 전 차단, SW0=1 기동·Reset 유지 PASS |
+| IDLE/PAUSED | 시간·필드·속도·시작/재개 차단 PASS |
+| RUN | 잠금 후에도 계수·구동 유지, KEY 일시정지 허용 PASS |
+| 해제 경계 | 누른 채인 KEY·해제와 동시 KEY 모두 시작 차단, 새 누름 필요 PASS |
+| 정지·개폐 | 잠금 중 취소·문 개폐·이동 취소 및 UNKNOWN 복구 PASS |
+| DONE | 잠금 중 만료·KEY 확인·3초 알림 후 자동 복귀 PASS |
+| 부저 | 차단된 실제 버튼 누름의 BEEP 유지 PASS |
+| Python 설정 회귀 | 9개 OK, Part·Top·45개 핀·100 MHz 검사 PASS |
+| 합성·배치배선·Bitstream | 완료, DRC 위반·routing error 0 |
+| 내부 Timing | 100 MHz, setup +0.222 ns / hold +0.122 ns / pulse +4.500 ns |
+| 내부 제약 | no_clock·미제약 내부 endpoint·loops 등 자동 검사 모두 0 |
+| CDC | CDC-3 Info 10개 + CDC-9 Info 1개, 경고 없음 |
+| 자원 | LUT 824/20,800 (3.96%), FF 459/41,600 (1.10%), IOB 45, BUFG 1 |
+| 새 기능 실기 확인 | 미실행 |
+
+Simulation 근거는 `build/step11/20261028_152115_169069/`의 16개 PASS 로그와 WDB입니다.
+`tb_control_lock`은 마스크와 필터 경계를 검사하고 `tb_top_control_lock`은 실제 Top의
+버튼·로터리·SW0 포트만 구동합니다. 기존 Top TB는 SW0=0으로 고정해 이전 전체 기능을 확인합니다.
+신규 RTL/TB는 포맷 정리 후 최종 전체 Simulation과 보드 빌드를 다시 실행했습니다.
+가열·시간·표시·부저·도어·서보·모터의 기존 모듈 본체는 그대로입니다.
+
+보드 빌드 근거는 `build/board/20261028_152128_18104/`의 `summary.txt`, Timing·CDC·DRC·
+Methodology·자원·route 보고서와 `microwave.bit`입니다. 보드 프로그래밍은 실행하지 않았습니다.
+기존 두 합성 경고 유형(Synth 8-6014, 8-7129)은 이전과 같고, 외부 출력 Timing 미정의에 따른
+TIMING-18 경고 32개도 남습니다. 내부 Timing 통과와 실제 I/O·부품 동작은 구분합니다.
+
+재생성 Tcl은 `build/vivado_step11/` 프로젝트 생성과 compile order를 통과했습니다.
+원본 XPR에 RTL 14개·TB 16개를 등록하고 보드 Top과 활성 XDC를 검사합니다.
+동작·새 핀·LED 변경 및 실기 순서는 [조작 잠금](control_lock.md)을 따릅니다.
+
+### 잠금 해제·KEY 동시 입력 회귀
+
+추가한 raw 입력 검사에서 SW0 해제와 KEY 누름의 필터 결과가 같은 클럭에 바뀌면
+초기 구현이 시작을 허용하는 것을 재현했습니다. 수정 전 근거는
+`build/step11_unlock_boundary_before_fix/simulate.txt`의
+`simultaneous unlock and KEY must not start` 실패입니다.
+
+해제 직후 한 클럭 동안 설정 허가를 보류하는 레지스터를 추가했습니다.
+시작·재개·설정에는 이 경계 보호를 적용하고, 일시정지·취소·개폐·종료 확인은 유지합니다.
+같은 raw 입력 회귀와 잠금 단위 경계 검사 모두 최종 16개 PASS에 포함됩니다.
+최종 근거는 위의 `20261028_152115_169069` Simulation과
+`20261028_152128_18104` 보드 빌드이며 초기 빌드와 구분합니다.
+
+## STEP 10 최종 재검토
 
 기준 커밋 `7b13034` 이후 저장소 검사기의 Part·보드 Top·비활성 XDC 오판을 보완했습니다.
 Python 설정 회귀 9개가 OK이고 기존 RTL TB 14개가
 `build/step10/20261028_144554_446843/`에서 모두 PASS입니다.
 원본 XPR 읽기 검사와 소스만 복사한 경로에서의 프로젝트 재생성도 통과했습니다.
-현재 RTL/TB의 토큰과 활성 XDC는 이전 검증본과 같으며 합성·Timing은 재실행하지 않았습니다.
+해당 검토 당시 RTL/TB의 토큰과 활성 XDC는 이전 검증본과 같아 합성·Timing을 재실행하지 않았습니다.
 세부 결과와 종결 보류 사유는 [전체 검토](review.md)의 최종 재검토 절을 따릅니다.
 
 ## 전체 검토 후 재검증

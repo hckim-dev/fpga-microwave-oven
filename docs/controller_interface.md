@@ -77,3 +77,7 @@ STEP 8의 `tb_door_control`에서 도어 FSM·서보의 닫힘 추정과 개폐 
 STEP 9의 `tb_motor_control`에서 모터 PWM과 실행/도어 조건을 연결해 검증했습니다.
 STEP 10의 `tb_top_microwave_oven`에서 실제 보드 포트부터 전체 논리 출력까지 검증했습니다.
 실제 Hardware는 미확인입니다. 연결과 시나리오는 [전체 통합](integration.md)을 따릅니다.
+
+STEP 11의 보드 Top에서는 조작 잠금 모듈을 거친 이벤트를 받습니다. 잠금 중 시작·재개·설정을
+차단하지만 RUN의 KEY 정지와 DONE의 확인은 유지합니다. 가열 제어부 자체의 FSM·우선순위는
+변경하지 않았습니다. 자세한 계약은 [조작 잠금](control_lock.md)을 따릅니다.

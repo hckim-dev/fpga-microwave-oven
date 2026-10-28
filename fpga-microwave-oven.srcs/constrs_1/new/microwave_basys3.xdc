@@ -2,6 +2,7 @@
 # clk 외 입력은 비동기이며 top_microwave_oven의 사용 포트만 배정한다.
 # J3/L3 외부 풀다운과 KEY active-low를 사용하며 내부 pull은 추가하지 않는다.
 set_property -dict {PACKAGE_PIN W5 IOSTANDARD LVCMOS33} [get_ports {clk}]
+set_property -dict {PACKAGE_PIN V17 IOSTANDARD LVCMOS33} [get_ports {lock_switch}]
 set_property -dict {PACKAGE_PIN U18 IOSTANDARD LVCMOS33} [get_ports {btnC}]
 set_property -dict {PACKAGE_PIN W19 IOSTANDARD LVCMOS33} [get_ports {btnL}]
 set_property -dict {PACKAGE_PIN T18 IOSTANDARD LVCMOS33} [get_ports {btnU}]
@@ -48,7 +49,7 @@ set_property -dict {PACKAGE_PIN L1 IOSTANDARD LVCMOS33} [get_ports {led[15]}]
 create_clock -name sys_clk -period 10.000 [get_ports clk]
 # 비동기 입력 도착 경로만 제외하며 동기화 FF 사이 경로는 Timing 검사에 포함한다.
 # btnC는 Reset 동기화기의 비동기 preset 핀에만 연결한다.
-set_false_path -from [get_ports {btnC btnL btnU btnD btnR door_open door_close rotary_s1 rotary_s2 rotary_key}]
+set_false_path -from [get_ports {btnC btnL btnU btnD btnR door_open door_close rotary_s1 rotary_s2 rotary_key lock_switch}]
 # 외부 출력의 동기 수신 Timing 규격은 미정의 상태다.
 # 임의의 output delay를 넣지 않고 미제약 경고를 보고한다.
 set_property CONFIG_VOLTAGE 3.3 [current_design]

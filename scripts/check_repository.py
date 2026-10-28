@@ -100,6 +100,7 @@ def main():
         )
     }
     aliases = {
+        "lock_switch": "{sw[0]}",
         "seg[7]": "dp",
         "door_open": "{JXADC[0]}",
         "door_close": "{JXADC[1]}",

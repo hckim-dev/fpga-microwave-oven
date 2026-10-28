@@ -1,15 +1,18 @@
 # 전체 모듈 통합
 
-STEP 10의 Design Top은 `top_microwave_oven`, Simulation Top은
-`tb_top_microwave_oven`입니다. 기본 Parameter는 Basys3의 100 MHz를 기준으로 합니다.
+STEP 11의 Design Top은 `top_microwave_oven`, Simulation Top은
+`tb_top_control_lock`입니다. 기본 Parameter는 Basys3의 100 MHz를 기준으로 합니다.
 모든 모듈은 동일한 `clk`를 사용하며 `tick_1ms`는 clock enable입니다.
 
 ```mermaid
 flowchart LR
   GPIO[버튼 · EC11] --> INPUT[input_frontend]
-  INPUT --> CONTROL[microwave_controller]
+  INPUT --> LOCK[control_lock]
+  SW0[SW0] --> LOCK
+  LOCK --> CONTROL[microwave_controller]
+  CONTROL -->|상태| LOCK
   INPUT --> DOOR[door_controller]
-  INPUT --> MOTOR[motor_controller]
+  LOCK --> MOTOR[motor_controller]
   INPUT --> SOUND[sound_controller]
   DOOR -->|허가 · 목표| SERVO[servo_controller]
   SERVO -->|command_applied| DOOR
@@ -33,6 +36,7 @@ flowchart LR
 | Top 포트 | Basys3 위치 / FPGA 핀 | 역할 |
 | --- | --- | --- |
 | `clk` | W5 | 100 MHz |
+| `lock_switch` | 보드 SW0 / V17 | 1=조작 잠금, 0=해제 |
 | `btnC` | 중앙 / U18 | 전체 Reset |
 | `btnL` | 왼쪽 / W19 | 분·초 선택 |
 | `btnU`, `btnD` | 위 T18 / 아래 U17 | 속도 증가·감소 |
@@ -49,7 +53,7 @@ flowchart LR
 | `an[3:0]` | 보드 4자리 선택 | active-low |
 | `led[15:0]` | 보드 LED | 아래 상태 표시 |
 
-새 센서는 추가하지 않았습니다. J3/L3 풀다운 및 기존 핀 위치를 유지하며 내부 pull을 추가하지 않습니다.
+외부 센서·배선 추가 없이 기존 보드 SW0로 조작 잠금을 추가했습니다. J3/L3 풀다운 및 기존 핀 위치를 유지하며 내부 pull을 추가하지 않습니다.
 입력 도착 시간은 비동기이므로 입력 포트에 한정해 false path를 적용합니다.
 동기화 FF 간 경로와 이후 로직은 10 ns 클럭으로 검사합니다.
 LED/FND/액추에이터 출력의 외부 동기 수신기 Timing 규격은 정의하지 않았으므로
@@ -72,7 +76,7 @@ LED/FND/액추에이터 출력의 외부 동기 수신기 Timing 규격은 정�
 | LD11 | 서보 펄스 허가 |
 | LD12 | 소리 envelope |
 | LD13 | 소리 큐 초과, Reset/취소로 해제 |
-| LD14 | 로터리 invalid 이벤트, 1클럭이므로 육안 관찰용 아님 |
+| LD14 | 조작 잠금, 입력 안정화 전에도 잠금으로 취급 |
 | LD15 | 내부 Reset |
 
 Reset 후에는 도어 UNKNOWN으로 시작하며 자동으로 서보를 움직이지 않습니다.
@@ -102,4 +106,9 @@ tick 간격, debounce, PWM/서보 주기와 이동 대기만 축소합니다.
 실제 닫힘 센서가 없으므로 이 상태를 안전 인터록의 실측값으로 해석할 수 없습니다.
 `PassiveBuzzer=0`이 기본이며 부저 종류·음량·직결 전기 조건은 실기 미확인입니다.
 외부 부품 전원·구동 적합성과 실제 회전·개폐는 Bitstream 생성 성공으로 확인되지 않습니다.
-자체 아이디어, 최종 실기 검증과 발표자료는 후속 단계입니다.
+자체 아이디어는 [조작 잠금](control_lock.md)으로 구현했습니다. 새 기능의 실기 확인과
+최종 실기 기록·발표자료는 후속 단계입니다.
+
+SW0=0에서는 기존 조작을 유지합니다. SW0=1에서는 설정·시작·재개를 차단하지만
+취소·일시정지·문 개폐·종료 처리는 유지합니다. LD14는 잠금 표시로 변경했고
+rotary_invalid는 내부 관찰 신호로 유지합니다. 잠금 입력은 버튼과 같은 필터 계수를 사용합니다.

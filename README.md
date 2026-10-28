@@ -1,22 +1,24 @@
 # FPGA Microwave Oven
 
 Basys3에서 시간 설정, 도어 서보, 모터 PWM, 표시와 효과음을 구현하는 Verilog 프로젝트입니다.
-현재 **STEP 10: 기본 기능 Top 통합 및 14개 Simulation PASS** 상태입니다.
+현재 **STEP 11: 조작 잠금(R09) 추가 및 16개 Simulation PASS** 상태입니다.
 합성·배치배선·Bitstream 생성과 100 MHz 내부 Timing 검사를 통과했습니다.
-사용자는 기본 동작이 정상이라고 보고했습니다. 항목별 실기 근거와 SG90 떨림 원인 확인은 남아 있습니다.
+사용자는 기본 동작이 정상이라고 보고했고 SG90 떨림은 자연스러운 동작으로 수용해 종결했습니다.
+새 조작 잠금은 실기 확인 전이며, 항목별 실기 기록과 발표자료가 남아 있습니다.
 
 - 대상: Basys3 / `xc7a35tcpg236-1`, 100 MHz
 - 확인한 Simulator: Vivado XSim 2026.1
 - HDL: Verilog `.v`, 단일 클럭과 clock enable 방식
-- 구현 범위: 입력, 시간 제어, FND, 부저, 서보/도어, 모터 속도 설정과 PWM
+- 구현 범위: 입력, 시간 제어, FND, 부저, 서보/도어, 모터 속도 설정과 PWM, SW0 조작 잠금
 
 ## 구성과 진행 상태
 
 | 경로 | 내용 |
 | --- | --- |
-| `fpga-microwave-oven.srcs/sources_1/new/` | RTL 13개: 보드 Top과 입력·시간·표시·부저·도어·모터 |
-| `fpga-microwave-oven.srcs/sim_1/new/` | 자동 판정 Testbench 14개 |
-| `scripts/verify_step10.py` | 현재 14개 TB 실행 및 로그·Waveform 저장 |
+| `fpga-microwave-oven.srcs/sources_1/new/` | RTL 14개: 보드 Top과 입력·시간·표시·부저·도어·모터·잠금 |
+| `fpga-microwave-oven.srcs/sim_1/new/` | 자동 판정 Testbench 16개 |
+| `scripts/verify_step11.py` | 현재 16개 TB 실행 및 로그·Waveform 저장 |
+| `scripts/verify_step10.py` | 이전 14개 TB 실행 |
 | `scripts/check_repository.py` | FPGA Part·보드 Top·활성 핀/클럭·파일·문서·Git 검사 |
 | `scripts/test_repository_checks.py` | 정상 설정과 잘못된 설정의 회귀 검사 9개 |
 | `scripts/build_board.tcl` | 합성·배치배선·내부 Timing 검사·Bitstream 생성 |
@@ -26,7 +28,7 @@ Basys3에서 시간 설정, 도어 서보, 모터 PWM, 표시와 효과음을 �
 | `scripts/verify_step6.py` | 이전 입력·시간·표시 6개 TB 실행 |
 | `scripts/verify_step5.py` | 이전 입력·시간 제어 4개 TB 실행 |
 | `scripts/verify_step4.py` | 공통 XSim 실행 코드와 이전 2개 TB 실행 |
-| `scripts/create_project.tcl` | 상대 경로로 STEP 10 보드 프로젝트 재생성 |
+| `scripts/create_project.tcl` | 상대 경로로 STEP 11 보드 프로젝트 재생성 |
 | `scripts/check_step4_project.tcl` | 원본 XPR의 Source/Top 읽기 전용 검사 |
 | [전체 통합과 보드 연결](docs/integration.md) | 모듈 연결, 핀, LED와 실기 확인 순서 |
 | [입력 Interface](docs/input_interface.md) | 극성, 이벤트와 Parameter 계약 |
@@ -35,6 +37,7 @@ Basys3에서 시간 설정, 도어 서보, 모터 PWM, 표시와 효과음을 �
 | [부저 Interface](docs/sound_interface.md) | 리듬·우선순위·입력 보존·출력 모드 |
 | [서보·도어 Interface](docs/door_interface.md) | 펄스·도어 FSM·이동 대기·추정 상태 |
 | [모터 Interface](docs/motor_interface.md) | 속도 단계·PWM 주기·정지 조건 |
+| [조작 잠금](docs/control_lock.md) | SW0·LD14, 잠금 중 허용 조작과 검증 |
 | [하드웨어 확인](docs/hardware_test.md) | 조작·실기 체크리스트·남은 관찰 |
 | [전체 검토](docs/review.md) | 검토 기준·정리 내용·검증 결과 |
 | [검증 기록](docs/verification.md) | 완료 조건, 시나리오와 실제 실행 결과 |
@@ -47,12 +50,12 @@ Python 3과 Vivado XSim이 필요합니다. 저장소 루트에서 실행합니�
 ```powershell
 python scripts/check_repository.py
 python scripts/test_repository_checks.py
-python scripts/verify_step10.py --vivado-bin "C:/AMDDesignTools/2026.1/Vivado/bin"
+python scripts/verify_step11.py --vivado-bin "C:/AMDDesignTools/2026.1/Vivado/bin"
 ```
 
 경로는 본인의 설치 위치로 바꾸세요. `VIVADO_BIN` 환경 변수 또는 PATH도 지원합니다.
-실행은 XPR을 열거나 변경하지 않으며 결과는 `build/step10/<실행시각>/`에 저장됩니다.
-저장소 검사 PASS, Python 회귀 검사 9개 OK, 열네 Simulation PASS를 각각 확인합니다.
+실행은 XPR을 열거나 변경하지 않으며 결과는 `build/step11/<실행시각>/`에 저장됩니다.
+저장소 검사 PASS, Python 회귀 검사 9개 OK, 열여섯 Simulation PASS를 각각 확인합니다.
 각 명령이 오류 없이 끝나야 전체 검증 성공으로 판정합니다.
 기본 서보 Timing 검사만 약 40 ms의 Simulation 시간을 실행하며, 해당 WDB는 고속 내부
 카운터 대신 외부 펄스·제어 신호를 기록합니다.
@@ -61,7 +64,7 @@ python scripts/verify_step10.py --vivado-bin "C:/AMDDesignTools/2026.1/Vivado/bi
 ## Vivado에서 열기
 
 기존 `fpga-microwave-oven.xpr`의 Design Top은 `top_microwave_oven`, Simulation Top은
-`tb_top_microwave_oven`으로 변경했습니다. 열려 있던 Vivado에서는 프로젝트를 다시 여세요.
+`tb_top_control_lock`으로 변경했습니다. 열려 있던 Vivado에서는 프로젝트를 다시 여세요.
 Run Behavioral Simulation → Run All → `PASS:`를 확인합니다.
 보드 Design Top은 `top_microwave_oven`으로 유지하고 Simulation Top만 단위 TB로 바꿀 수 있습니다.
 Top 테스트는 실제 버튼·로터리 포트를 구동하며 내부 이벤트를 강제 주입하지 않습니다.
@@ -72,7 +75,7 @@ Top 테스트는 실제 버튼·로터리 포트를 구동하며 내부 이벤�
 source scripts/create_project.tcl
 ```
 
-`build/vivado_step10/`에 별도 프로젝트를 만들며 기존 생성 프로젝트를 덮어쓰지 않습니다.
+`build/vivado_step11/`에 별도 프로젝트를 만들며 기존 생성 프로젝트를 덮어쓰지 않습니다.
 Tcl Console의 작업 디렉터리가 다르면 스크립트의 절대 경로를 사용하세요.
 보드 핀은 [통합 문서](docs/integration.md)의 표와 활성 `microwave_basys3.xdc`를 따릅니다.
 
@@ -101,7 +104,7 @@ Vivado의 `.cache`, `.hw`, `.ip_user_files`, `.runs`, `.sim`, `.gen`, `.tmp`,
 
 Simulation과 보드 빌드의 실제 결과·제약·경고는 [검증 기록](docs/verification.md)을 따릅니다.
 자동화 과정에서 보드를 프로그래밍하지 않았습니다. 사용자 동작 보고와 측정·영상 근거는 구분합니다.
-실기 항목별 기록, 자체 아이디어(R09)와 최종 발표자료는 남아 있습니다.
+자체 아이디어(R09)는 SW0 조작 잠금으로 구현했습니다. 실기 항목별 기록과 최종 발표자료는 남아 있습니다.
 외부 부품의 전원 조건과 부저 직결의 전기적 적합성도 검증 완료로 간주하지 않습니다.
 센서 없이 사용하는 도어 상태는 서보 명령·시간 경과 기반 추정값입니다.
 서보 펄스 폭과 이동 대기 기본값은 기구와 부하에서 보정하기 전의 값이며 실제 각도·도착을 보장하지 않습니다.

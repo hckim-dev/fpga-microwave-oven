@@ -28,6 +28,7 @@ module tb_top_microwave_oven;
       .PwmPeriodClocks(10)
   ) dut (
       .clk(clk),
+      .lock_switch(1'b0),
       .btnC(reset),
       .btnL(buttons[0]),
       .btnU(buttons[1]),
