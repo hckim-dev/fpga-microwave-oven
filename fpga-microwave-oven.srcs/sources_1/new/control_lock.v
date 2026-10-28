@@ -18,7 +18,7 @@ module control_lock #(
 );
   localparam [1:0] RUN = 2'd1, DONE = 2'd3;
   wire w_clean_lock;
-  reg r_was_locked;
+  reg  r_was_locked;
   wire w_settings_allowed = !locked && !r_was_locked;
 
   btn_debouncer #(
