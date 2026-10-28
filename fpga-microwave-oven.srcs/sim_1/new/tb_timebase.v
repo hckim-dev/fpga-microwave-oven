@@ -11,21 +11,34 @@ module tb_timebase;
 
   // 외부 Reset을 누르지 않아도 구성 직후 두 클럭 동안 초기화.
   reset_synchronizer u_startup_reset (
-      .clk(clk), .reset(1'b0), .synced_reset(startup_reset)
+      .clk(clk),
+      .reset(1'b0),
+      .synced_reset(startup_reset)
   );
 
-  tick_generator u_tick (.clk(clk), .reset(reset), .tick(tick));
-  btn_debouncer u_debounce (
-      .clk(clk), .reset(reset), .noisy_btn(noisy_btn), .clean_btn(clean_btn)
+  tick_generator u_tick (
+      .clk(clk),
+      .reset(reset),
+      .tick(tick)
   );
+
+  btn_debouncer u_debounce (
+      .clk(clk),
+      .reset(reset),
+      .noisy_btn(noisy_btn),
+      .clean_btn(clean_btn)
+  );
+
   always #5 clk = ~clk;
 
   initial begin
     #1;
     if (startup_reset !== 1) $fatal(1, "power-on reset assertion");
-    @(posedge clk); #1;
+    @(posedge clk);
+    #1;
     if (startup_reset !== 1) $fatal(1, "power-on first clock");
-    @(posedge clk); #1;
+    @(posedge clk);
+    #1;
     if (startup_reset !== 0) $fatal(1, "power-on second clock");
   end
 
@@ -40,11 +53,11 @@ module tb_timebase;
       cycles = cycles + 1;
       if (tick !== ((cycles % 100_000) == 0)) $fatal(1, "default tick boundary: %0d", cycles);
       if (tick) ticks = ticks + 1;
-      if (clean_btn !== (cycles == 1_000_002))
-        $fatal(1, "default debounce boundary: %0d", cycles);
+      if (clean_btn !== (cycles == 1_000_002)) $fatal(1, "default debounce boundary: %0d", cycles);
     end
     if (ticks != 10) $fatal(1, "default tick count");
-    $display("PASS: default 100 MHz, exact 100000-clock tick and 1000000-clock stable debounce after two synchronizer clocks");
+    $display(
+        "PASS: default 100 MHz, exact 100000-clock tick and 1000000-clock stable debounce after two synchronizer clocks");
     $finish;
   end
 

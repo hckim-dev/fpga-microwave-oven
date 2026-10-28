@@ -18,11 +18,13 @@ module rotary_decoder #(
   reg signed [1:0] w_delta;
   reg w_invalid;
 
-  // {S1,S2}: CW 00 -> 10 -> 11 -> 01 -> 00.
+  // CW 전이 순서: {S1,S2} = 00 -> 10 -> 11 -> 01 -> 00.
   always @(*) begin
     w_delta = 0;
     w_invalid = 0;
-    case ({r_prev_ab, ab})
+    case ({
+      r_prev_ab, ab
+    })
       4'b0010, 4'b1011, 4'b1101, 4'b0100: w_delta = 1;
       4'b0001, 4'b0111, 4'b1110, 4'b1000: w_delta = -1;
       4'b0000, 4'b0101, 4'b1010, 4'b1111: w_delta = 0;

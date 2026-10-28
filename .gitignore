@@ -1,7 +1,7 @@
-# Local verification and regenerated projects.
+# 로컬 검증 결과와 재생성 프로젝트
 /build/
 
-# Vivado generated directories. Keep the XPR and managed .srcs files.
+# Vivado 생성 디렉터리: XPR과 관리하는 .srcs 소스는 유지
 /*.cache/
 /*.gen/
 /*.hw/
@@ -13,8 +13,8 @@
 /.Xil/
 /xsim.dir/
 
-# Tool output created by launching Vivado/XSim from the repository root.
-# Deliberately selected evidence under docs/ is not excluded by extension.
+# 저장소 루트에서 실행한 Vivado/XSim의 산출물
+# docs/에 선별한 검증 근거는 확장자로 일괄 제외하지 않음
 /*.jou
 /*.log
 /*.pb
@@ -33,7 +33,7 @@
 /clockInfo.txt
 /*.xpr.bak
 
-# Python environment and caches.
+# Python 환경과 캐시
 /.venv/
 /venv/
 __pycache__/
@@ -41,7 +41,7 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 
-# Personal editor settings, backups, and OS metadata.
+# 개인 편집기 설정, 백업과 운영체제 메타데이터
 /.vscode/
 /.idea/
 *~

@@ -16,18 +16,41 @@ module tb_servo_controller;
   reg default_ack_expected;
   reg default_complete = 0;
 
-  servo_controller #(.FrameClocks(20), .ClosedPulseClocks(3), .OpenPulseClocks(5)) dut (
-      .clk(clk), .reset(reset), .enable(enable), .target_open(target_open),
-      .servo_pwm(servo_pwm), .command_applied(applied)
+  servo_controller #(
+      .FrameClocks(20),
+      .ClosedPulseClocks(3),
+      .OpenPulseClocks(5)
+  ) dut (
+      .clk(clk),
+      .reset(reset),
+      .enable(enable),
+      .target_open(target_open),
+      .servo_pwm(servo_pwm),
+      .command_applied(applied)
   );
-  servo_controller #(.FrameClocks(4), .ClosedPulseClocks(1), .OpenPulseClocks(2)) u_min (
-      .clk(clk), .reset(reset), .enable(enable), .target_open(target_open),
-      .servo_pwm(min_pwm), .command_applied(min_applied)
+
+  servo_controller #(
+      .FrameClocks(4),
+      .ClosedPulseClocks(1),
+      .OpenPulseClocks(2)
+  ) u_min (
+      .clk(clk),
+      .reset(reset),
+      .enable(enable),
+      .target_open(target_open),
+      .servo_pwm(min_pwm),
+      .command_applied(min_applied)
   );
+
   servo_controller u_default (
-      .clk(clk), .reset(default_reset), .enable(1'b1), .target_open(default_target),
-      .servo_pwm(default_pwm), .command_applied(default_applied)
+      .clk(clk),
+      .reset(default_reset),
+      .enable(1'b1),
+      .target_open(default_target),
+      .servo_pwm(default_pwm),
+      .command_applied(default_applied)
   );
+
   always #5 clk = ~clk;
 
   // 사양의 프레임 위치로 출력과 적용 통지를 매 클럭 대조.
@@ -87,7 +110,11 @@ module tb_servo_controller;
   end
 
   task cycle;
-    begin @(posedge clk); #2; @(negedge clk); end
+    begin
+      @(posedge clk);
+      #2;
+      @(negedge clk);
+    end
   endtask
 
   initial begin
@@ -103,33 +130,43 @@ module tb_servo_controller;
     reset = 0;
     scenario = 1;
     repeat (5) cycle();
-    enable = 1; cycle();
+    enable = 1;
+    cycle();
     if (!servo_pwm || !applied) $fatal(1, "first enabled frame");
-    cycle(); target_open = 1;
+    cycle();
+    target_open = 1;
     repeat (45) cycle();
     scenario = 2;
     target_open = 0;
     repeat (45) cycle();
     // 현재 프레임 내에서 바뀌었다가 원래 목표로 돌아오면 중간 명령은 적용하지 않음.
-    target_open = 1; cycle(); target_open = 0;
+    target_open = 1;
+    cycle();
+    target_open = 0;
     repeat (40) cycle();
     scenario = 3;
-    enable = 0; #1;
+    enable = 0;
+    #1;
     if (servo_pwm || min_pwm) $fatal(1, "enable must immediately mute");
     repeat (2) cycle();
-    enable = 1; target_open = 1; cycle();
+    enable = 1;
+    target_open = 1;
+    cycle();
     if (!servo_pwm || !applied) $fatal(1, "reenable must start a new frame");
     scenario = 4;
-    #2 reset = 1; #1;
+    #2 reset = 1;
+    #1;
     if (servo_pwm || applied || min_pwm || min_applied) $fatal(1, "async reset during HIGH");
-    cycle(); reset = 0;
+    cycle();
+    reset = 0;
     repeat (30) cycle();
     enable = 0;
     scenario = 5;
     wait (default_complete);
     @(negedge clk);
     if (default_highs != 250_000 || default_acks != 2) $fatal(1, "default complete frame totals");
-    $display("PASS: default 100 MHz/20 ms frames, 1 ms/1.5 ms widths, frame-boundary target apply, one-shot acknowledgment, disable/reset/restart, minimum counters");
+    $display(
+        "PASS: default 100 MHz/20 ms frames, 1 ms/1.5 ms widths, frame-boundary target apply, one-shot acknowledgment, disable/reset/restart, minimum counters");
     $finish;
   end
   initial begin

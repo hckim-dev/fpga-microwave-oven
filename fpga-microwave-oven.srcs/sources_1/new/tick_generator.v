@@ -3,9 +3,9 @@
 module tick_generator #(
     parameter integer TickCount = 100_000  // 100 MHz에서 1 ms
 ) (
-    input  wire clk,
-    input  wire reset,
-    output reg  tick
+    input wire clk,
+    input wire reset,
+    output reg tick
 );
   localparam integer CountWidth = (TickCount > 1) ? $clog2(TickCount) : 1;
   reg [CountWidth-1:0] r_count;

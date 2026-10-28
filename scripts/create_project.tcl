@@ -1,7 +1,7 @@
-# Recreate the current STEP 10 board project without local machine paths.
+# 저장소 상대 경로로 보드 프로젝트를 재생성한다.
 set repo_root [file normalize [file join [file dirname [info script]] ..]]
 set output_dir [file join $repo_root build vivado_step10]
-# Do not overwrite an existing generated project.
+# 기존 생성 프로젝트를 덮어쓰지 않는다.
 if {[file exists [file join $output_dir microwave_step10.xpr]]} {
     error "Project already exists: $output_dir. Open it or choose another output directory."
 }

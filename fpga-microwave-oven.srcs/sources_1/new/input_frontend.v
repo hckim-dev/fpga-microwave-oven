@@ -36,6 +36,7 @@ module input_frontend #(
       .reset(reset),
       .synced_reset(synced_reset)
   );
+
   tick_generator #(
       .TickCount(TickCount)
   ) u_tick (
@@ -55,6 +56,7 @@ module input_frontend #(
           .noisy_btn(button_raw[i] ^ ButtonActiveLow[i]),
           .clean_btn(w_clean_button[i])
       );
+
     end
     for (i = 0; i < 2; i = i + 1) begin : g_rotary
       btn_debouncer #(
@@ -65,6 +67,7 @@ module input_frontend #(
           .noisy_btn(rotary_ab_raw[i]),
           .clean_btn(w_clean_ab[i])
       );
+
     end
   endgenerate
 
@@ -88,7 +91,7 @@ module input_frontend #(
   ) u_rotary (
       .clk(clk),
       .reset(synced_reset),
-      // 기동 대기는 동기식 enable로 처리하여 조합 논리의 비동기 Reset 구동 방지.
+      // 기동 대기는 동기식 enable로 처리해 비동기 Reset 경로의 조합 논리를 피한다.
       .enable(ready),
       .ab(w_clean_ab),
       .cw_pulse(rotary_cw),

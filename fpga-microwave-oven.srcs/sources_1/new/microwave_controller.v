@@ -27,8 +27,7 @@ module microwave_controller (
   wire w_open = button_pulse[4];
   wire w_close = button_pulse[5];
   wire w_key = button_pulse[6];
-  wire w_expire = tick_1ms && (r_elapsed_ms == 10'd999) &&
-                  (remaining_seconds == 12'd1);
+  wire w_expire = tick_1ms && (r_elapsed_ms == 10'd999) && (remaining_seconds == 12'd1);
 
   assign w_minutes = remaining_seconds / 12'd60;
   assign w_seconds = remaining_seconds % 12'd60;

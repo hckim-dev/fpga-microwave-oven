@@ -20,16 +20,34 @@ module tb_controller_display;
   reg prev_alert_done = 0;
 
   microwave_controller u_control (
-      .clk(clk), .reset(reset), .tick_1ms(tick_1ms), .button_pulse(button_pulse),
-      .rotary_cw(rotary_cw), .rotary_ccw(1'b0), .door_closed(1'b1), .alert_done(alert_done),
-      .state(state), .remaining_seconds(remaining_seconds), .select_minutes(select_minutes),
-      .run_enable(run_enable), .timeout_pulse(timeout_pulse)
+      .clk(clk),
+      .reset(reset),
+      .tick_1ms(tick_1ms),
+      .button_pulse(button_pulse),
+      .rotary_cw(rotary_cw),
+      .rotary_ccw(1'b0),
+      .door_closed(1'b1),
+      .alert_done(alert_done),
+      .state(state),
+      .remaining_seconds(remaining_seconds),
+      .select_minutes(select_minutes),
+      .run_enable(run_enable),
+      .timeout_pulse(timeout_pulse)
   );
+
   display_controller u_display (
-      .clk(clk), .reset(reset), .tick_1ms(tick_1ms), .state(state),
-      .remaining_seconds(remaining_seconds), .select_minutes(select_minutes),
-      .seg(seg), .an(an), .alert_done(alert_done), .alert_on(alert_on)
+      .clk(clk),
+      .reset(reset),
+      .tick_1ms(tick_1ms),
+      .state(state),
+      .remaining_seconds(remaining_seconds),
+      .select_minutes(select_minutes),
+      .seg(seg),
+      .an(an),
+      .alert_done(alert_done),
+      .alert_on(alert_on)
   );
+
   always #5 clk = ~clk;
   always @(posedge clk) begin
     if (reset) r_tick_count <= 0;
@@ -61,8 +79,13 @@ module tb_controller_display;
 
   task start_one_second;
     begin
-      rotary_cw = 1; wait_cycles(1); rotary_cw = 0; wait_cycles(1);
-      button_pulse = 7'b1000000; wait_cycles(1); button_pulse = 0;
+      rotary_cw = 1;
+      wait_cycles(1);
+      rotary_cw = 0;
+      wait_cycles(1);
+      button_pulse = 7'b1000000;
+      wait_cycles(1);
+      button_pulse = 0;
       wait_cycles(1);
       if (state !== 1 || remaining_seconds !== 1) $fatal(1, "start one second");
     end
@@ -99,7 +122,9 @@ module tb_controller_display;
     start_one_second();
     wait (state == 3);
     wait_cycles(2500);
-    button_pulse = 7'b0001000; wait_cycles(1); button_pulse = 0;
+    button_pulse = 7'b0001000;
+    wait_cycles(1);
+    button_pulse = 0;
     wait_cycles(16000);
     if (state !== 0 || alert_done || completed_alerts != 2)
       $fatal(1, "cancelled alert generated stale completion");
@@ -108,11 +133,14 @@ module tb_controller_display;
     start_one_second();
     wait (state == 3);
     wait_cycles(2500);
-    button_pulse = 7'b1000000; wait_cycles(1); button_pulse = 0;
+    button_pulse = 7'b1000000;
+    wait_cycles(1);
+    button_pulse = 0;
     wait_cycles(16000);
     if (state !== 0 || alert_done || completed_alerts != 2)
       $fatal(1, "KEY acknowledged alert generated stale completion");
-    $display("PASS: controller/display feedback, exactly 3000 DONE ticks, door-event completion retry, cancel and KEY abort without stale completion");
+    $display(
+        "PASS: controller/display feedback, exactly 3000 DONE ticks, door-event completion retry, cancel and KEY abort without stale completion");
     $finish;
   end
   initial begin

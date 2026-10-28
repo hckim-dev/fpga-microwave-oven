@@ -74,8 +74,7 @@ module display_controller #(
     end else begin
       r_prev_state <= state;
       r_prev_select <= select_minutes;
-      if ((state != r_prev_state) ||
-          ((state == IDLE) && (select_minutes != r_prev_select))) begin
+      if ((state != r_prev_state) || ((state == IDLE) && (select_minutes != r_prev_select))) begin
         r_blink_count <= 0;
         r_screen_count <= 0;
         r_circle_count <= 0;
@@ -148,23 +147,26 @@ module display_controller #(
         default: w_digit = 0;
       endcase
       w_pattern = number_segments(w_digit);
-      w_hide_digit = (state == IDLE) && !r_blink_on &&
-                     (select_minutes ? (i >= 2) : (i < 2));
+      w_hide_digit = (state == IDLE) && !r_blink_on && (select_minutes ? (i >= 2) : (i < 2));
       if (w_hide_digit) w_pattern = 8'hFF;
       // 분·초 구분점은 왼쪽에서 두 번째 자리의 DP.
-      if ((i == 2) && ((state == IDLE) || (state == RUN) ||
-                      ((state == PAUSED) && r_blink_on))) w_pattern[7] = 0;
+      if ((i == 2) && ((state == IDLE) || (state == RUN) || ((state == PAUSED) && r_blink_on)))
+        w_pattern[7] = 0;
       if ((state == RUN) && r_show_circle) w_pattern = w_circle_pattern;
       if (state == DONE) begin
         if (alert_on) w_pattern = 8'hC0;
         else w_pattern = 8'hFF;
       end
-      w_patterns[i*8 +: 8] = w_pattern;
+      w_patterns[i*8+:8] = w_pattern;
     end
   end
 
   fnd_scanner u_scan (
-      .clk(clk), .reset(reset), .tick_1ms(tick_1ms), .digit_segments(w_patterns),
-      .seg(seg), .an(an)
+      .clk(clk),
+      .reset(reset),
+      .tick_1ms(tick_1ms),
+      .digit_segments(w_patterns),
+      .seg(seg),
+      .an(an)
   );
 endmodule

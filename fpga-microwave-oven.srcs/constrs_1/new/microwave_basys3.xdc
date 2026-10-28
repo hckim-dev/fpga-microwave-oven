@@ -1,6 +1,6 @@
-# Basys3 pin assignments from the bundled Digilent Basys-3-Master.xdc.
-# Only top_microwave_oven ports are constrained. All inputs except clk are asynchronous.
-# J3/L3 retain external pull-downs; EC11 KEY is active-low. No internal pulls added.
+# 핀 배정은 함께 보관한 Digilent Basys-3-Master.xdc를 기준으로 한다.
+# clk 외 입력은 비동기이며 top_microwave_oven의 사용 포트만 배정한다.
+# J3/L3 외부 풀다운과 KEY active-low를 사용하며 내부 pull은 추가하지 않는다.
 set_property -dict {PACKAGE_PIN W5 IOSTANDARD LVCMOS33} [get_ports {clk}]
 set_property -dict {PACKAGE_PIN U18 IOSTANDARD LVCMOS33} [get_ports {btnC}]
 set_property -dict {PACKAGE_PIN W19 IOSTANDARD LVCMOS33} [get_ports {btnL}]
@@ -46,11 +46,11 @@ set_property -dict {PACKAGE_PIN N3 IOSTANDARD LVCMOS33} [get_ports {led[13]}]
 set_property -dict {PACKAGE_PIN P1 IOSTANDARD LVCMOS33} [get_ports {led[14]}]
 set_property -dict {PACKAGE_PIN L1 IOSTANDARD LVCMOS33} [get_ports {led[15]}]
 create_clock -name sys_clk -period 10.000 [get_ports clk]
-# Cut only asynchronous board input arrival paths. Synchronizer stage-to-stage paths remain timed.
-# btnC reaches only the reset synchronizer asynchronous preset pins.
+# 비동기 입력 도착 경로만 제외하며 동기화 FF 사이 경로는 Timing 검사에 포함한다.
+# btnC는 Reset 동기화기의 비동기 preset 핀에만 연결한다.
 set_false_path -from [get_ports {btnC btnL btnU btnD btnR door_open door_close rotary_s1 rotary_s2 rotary_key}]
-# No external synchronous receiver exists for LED/FND/PWM/buzzer outputs.
-# External I/O delay requirements are unspecified; report them as unconstrained.
+# 외부 출력의 동기 수신 Timing 규격은 미정의 상태다.
+# 임의의 output delay를 넣지 않고 미제약 경고를 보고한다.
 set_property CONFIG_VOLTAGE 3.3 [current_design]
 set_property CFGBVS VCCO [current_design]
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]

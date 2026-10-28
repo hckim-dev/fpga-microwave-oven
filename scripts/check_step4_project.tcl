@@ -1,4 +1,4 @@
-# Read-only STEP 4..10 source registration check. Preserve the user's chosen Top.
+# 원본 XPR의 소스 등록과 선택된 Top을 읽기 전용으로 검사한다.
 set repo_root [file normalize [file join [file dirname [info script]] ..]]
 if {[info exists ::env(VIVADO_BOARD_REPO)]} {
     set_param board.repoPaths [list [file normalize $::env(VIVADO_BOARD_REPO)]]

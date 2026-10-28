@@ -5,7 +5,7 @@ module sound_controller #(
     parameter integer BeepGapMs = 20,
     parameter integer DoorStepMs = 70,
     parameter integer PassiveBuzzer = 0,
-    parameter integer ToneHalfClocks = 25_000  // 100 MHz / (2 * 25,000) = 2 kHz
+    parameter integer ToneHalfClocks = 25_000  // 100 MHz에서 2 kHz 반송파
 ) (
     input wire clk,
     input wire reset,
@@ -46,16 +46,14 @@ module sound_controller #(
   reg w_overflow;
   wire w_cancel = button_pulse[3];
   wire w_beep_pop = (r_beep_phase == BEEP_IDLE) && (r_pending_beeps != 0);
-  wire w_beep_busy = (r_beep_phase != BEEP_IDLE) || (r_pending_beeps != 0) ||
-                     (|button_pulse);
+  wire w_beep_busy = (r_beep_phase != BEEP_IDLE) || (r_pending_beeps != 0) || (|button_pulse);
   wire w_effect_pop = !w_beep_busy && !r_effect_active && (r_effect_count != 0);
   wire w_effect_on = r_effect_active && (r_effect_close || (r_effect_step != 1));
 
   // 버튼마다 한 번씩 보존. 효과음은 열기=0, 닫기=1인 4개 FIFO.
   always @(*) begin
     w_beep_requests = 0;
-    for (i = 0; i < 7; i = i + 1)
-      if (button_pulse[i]) w_beep_requests = w_beep_requests + 1;
+    for (i = 0; i < 7; i = i + 1) if (button_pulse[i]) w_beep_requests = w_beep_requests + 1;
     w_pending_next = r_pending_beeps + w_beep_requests - (w_beep_pop ? 1 : 0);
     w_overflow = (w_pending_next > 15);
     if (w_pending_next > 15) w_pending_next = 15;
@@ -93,7 +91,7 @@ module sound_controller #(
       r_effect_ms <= 0;
       queue_overflow <= 0;
     end else if (w_cancel) begin
-      // 기존 재생과 대기 요청 폐기 후 취소 버튼 BEEP 하나만 남김.
+      // 취소 시 현재·대기 소리를 폐기하고 취소 BEEP 하나만 남긴다.
       r_pending_beeps <= 1;
       r_beep_phase <= BEEP_IDLE;
       r_beep_count <= 0;
@@ -155,8 +153,7 @@ module sound_controller #(
   assign sound_active = !reset && !w_cancel &&
                         (w_beep_busy ? (r_beep_phase == BEEP_ON) :
                          r_effect_active ? w_effect_on : (alert_active && alert_on));
-  assign busy = !reset && (w_beep_busy || r_effect_active ||
-                          (r_effect_count != 0) || alert_active);
+  assign busy = !reset && (w_beep_busy || r_effect_active || (r_effect_count != 0) || alert_active);
 
   always @(posedge clk or posedge reset) begin
     if (reset) begin

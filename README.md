@@ -3,7 +3,7 @@
 Basys3에서 시간 설정, 도어 서보, 모터 PWM, 표시와 효과음을 구현하는 Verilog 프로젝트입니다.
 현재 **STEP 10: 기본 기능 Top 통합 및 14개 Simulation PASS** 상태입니다.
 합성·배치배선·Bitstream 생성과 100 MHz 내부 Timing 검사를 통과했습니다.
-외부 출력 Timing과 실제 보드 동작은 미확인입니다.
+사용자는 기본 동작이 정상이라고 보고했습니다. 항목별 실기 근거와 SG90 떨림 원인 확인은 남아 있습니다.
 
 - 대상: Basys3 / `xc7a35tcpg236-1`, 100 MHz
 - 확인한 Simulator: Vivado XSim 2026.1
@@ -17,6 +17,7 @@ Basys3에서 시간 설정, 도어 서보, 모터 PWM, 표시와 효과음을 �
 | `fpga-microwave-oven.srcs/sources_1/new/` | RTL 13개: 보드 Top과 입력·시간·표시·부저·도어·모터 |
 | `fpga-microwave-oven.srcs/sim_1/new/` | 자동 판정 Testbench 14개 |
 | `scripts/verify_step10.py` | 현재 14개 TB 실행 및 로그·Waveform 저장 |
+| `scripts/check_repository.py` | 파일·모듈명, XPR, 핀, 문서 링크·Git 제외 검사 |
 | `scripts/build_board.tcl` | 합성·배치배선·내부 Timing 검사·Bitstream 생성 |
 | `scripts/verify_step9.py` | 이전 13개 TB 실행 |
 | `scripts/verify_step8.py` | 이전 입력·시간·표시·부저·도어 11개 TB 실행 |
@@ -33,6 +34,8 @@ Basys3에서 시간 설정, 도어 서보, 모터 PWM, 표시와 효과음을 �
 | [부저 Interface](docs/sound_interface.md) | 리듬·우선순위·입력 보존·출력 모드 |
 | [서보·도어 Interface](docs/door_interface.md) | 펄스·도어 FSM·이동 대기·추정 상태 |
 | [모터 Interface](docs/motor_interface.md) | 속도 단계·PWM 주기·정지 조건 |
+| [하드웨어 확인](docs/hardware_test.md) | 조작·실기 체크리스트·남은 관찰 |
+| [전체 검토](docs/review.md) | 검토 기준·정리 내용·검증 결과 |
 | [검증 기록](docs/verification.md) | 완료 조건, 시나리오와 실제 실행 결과 |
 | [요구사항 추적](docs/requirements.md) | 구현·Simulation·실기·발표 근거 구분 |
 
@@ -41,6 +44,7 @@ Basys3에서 시간 설정, 도어 서보, 모터 PWM, 표시와 효과음을 �
 Python 3과 Vivado XSim이 필요합니다. 저장소 루트에서 실행합니다.
 
 ```powershell
+python scripts/check_repository.py
 python scripts/verify_step10.py --vivado-bin "C:/AMDDesignTools/2026.1/Vivado/bin"
 ```
 
@@ -77,7 +81,7 @@ Tcl Console의 작업 디렉터리가 다르면 스크립트의 절대 경로를
 `build/`가 없다면 먼저 `New-Item -ItemType Directory -Force build`로 만드세요.
 결과는 `build/board/<실행시각>_<프로세스ID>/`에 저장되며 원본 XPR이나 보드에 기록하지 않습니다.
 `summary.txt`, `timing_summary.rpt`, `drc.rpt`, `cdc.rpt`, `methodology.rpt`를 함께 확인합니다.
-스크립트는 내부 setup/hold slack이 음수이면 실패합니다. 외부 출력의 동기 Timing 규격은
+스크립트는 내부 setup/hold, 클럭 펄스 폭과 내부 제약 누락을 검사하며 위반 시 실패합니다. 외부 출력의 동기 Timing 규격은
 미정의이며 내부 Timing 통과와 구분합니다. 실제 실행 근거는 [검증 기록](docs/verification.md)에 남깁니다.
 
 ## Git 관리 범위
@@ -92,7 +96,8 @@ Vivado의 `.cache`, `.hw`, `.ip_user_files`, `.runs`, `.sim`, `.gen`, `.tmp`,
 ## 확인 범위
 
 Simulation과 보드 빌드의 실제 결과·제약·경고는 [검증 기록](docs/verification.md)을 따릅니다.
-보드 프로그래밍 및 실제 동작 확인은 수행하지 않았습니다. 기존 단계 산출물과 이번 실행을 구분합니다.
+자동화 과정에서 보드를 프로그래밍하지 않았습니다. 사용자 동작 보고와 측정·영상 근거는 구분합니다.
+실기 항목별 기록, 자체 아이디어(R09)와 최종 발표자료는 남아 있습니다.
 외부 부품의 전원 조건과 부저 직결의 전기적 적합성도 검증 완료로 간주하지 않습니다.
 센서 없이 사용하는 도어 상태는 서보 명령·시간 경과 기반 추정값입니다.
 서보 펄스 폭과 이동 대기 기본값은 기구와 부하에서 보정하기 전의 값이며 실제 각도·도착을 보장하지 않습니다.

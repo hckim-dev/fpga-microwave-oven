@@ -16,8 +16,7 @@ module servo_controller #(
   reg [FrameWidth-1:0] r_frame_count;
   reg r_started;
   reg r_target_open;
-  wire [FrameWidth-1:0] w_pulse_clocks =
-      r_target_open ? OpenPulseClocks : ClosedPulseClocks;
+  wire [FrameWidth-1:0] w_pulse_clocks = r_target_open ? OpenPulseClocks : ClosedPulseClocks;
 
   // 목표는 프레임 시작에서만 반영해 진행 중인 HIGH 펄스 폭을 바꾸지 않음.
   always @(posedge clk or posedge reset) begin

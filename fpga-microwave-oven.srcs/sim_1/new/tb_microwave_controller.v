@@ -24,17 +24,26 @@ module tb_microwave_controller;
   integer saved_fraction;
 
   microwave_controller dut (
-      .clk(clk), .reset(reset), .tick_1ms(tick_1ms), .button_pulse(button_pulse),
-      .rotary_cw(rotary_cw), .rotary_ccw(rotary_ccw), .door_closed(door_closed),
-      .alert_done(alert_done), .state(state), .remaining_seconds(remaining_seconds),
-      .select_minutes(select_minutes), .run_enable(run_enable), .timeout_pulse(timeout_pulse)
+      .clk(clk),
+      .reset(reset),
+      .tick_1ms(tick_1ms),
+      .button_pulse(button_pulse),
+      .rotary_cw(rotary_cw),
+      .rotary_ccw(rotary_ccw),
+      .door_closed(door_closed),
+      .alert_done(alert_done),
+      .state(state),
+      .remaining_seconds(remaining_seconds),
+      .select_minutes(select_minutes),
+      .run_enable(run_enable),
+      .timeout_pulse(timeout_pulse)
   );
+
   always #5 clk = ~clk;
 
   always @(posedge clk) begin
     #2;
-    if (remaining_seconds > 3599 || dut.r_elapsed_ms > 999)
-      $fatal(1, "range invariant");
+    if (remaining_seconds > 3599 || dut.r_elapsed_ms > 999) $fatal(1, "range invariant");
     if (state == RUN && remaining_seconds == 0) $fatal(1, "zero-time RUN");
     if (run_enable && (state != RUN || !door_closed || reset))
       $fatal(1, "run permission invariant");
@@ -43,7 +52,9 @@ module tb_microwave_controller;
 
   task cycle;
     begin
-      @(posedge clk); #1; @(negedge clk);
+      @(posedge clk);
+      #1;
+      @(negedge clk);
     end
   endtask
 
@@ -91,7 +102,10 @@ module tb_microwave_controller;
     begin
       if (state !== expected_state || remaining_seconds !== expected_seconds ||
           select_minutes !== expected_field)
-        $fatal(1, "%0s: state=%0d time=%0d field=%b", reason, state, remaining_seconds, select_minutes);
+        $fatal(
+            1, "%0s: state=%0d time=%0d field=%b", reason, state, remaining_seconds, select_minutes
+        );
+
     end
   endtask
 
@@ -279,7 +293,8 @@ module tb_microwave_controller;
     expect_value(IDLE, 0, 0, "cancel from DONE");
     if (timeout_pulse !== 0) $fatal(1, "cancel leaves stale timeout");
 
-    $display("PASS: time setting 00:00..59:59, field saturation, countdown, pause fraction, cancel, door interlock, DONE, timeout pulse, event priorities, reset");
+    $display(
+        "PASS: time setting 00:00..59:59, field saturation, countdown, pause fraction, cancel, door interlock, DONE, timeout pulse, event priorities, reset");
     $finish;
   end
 

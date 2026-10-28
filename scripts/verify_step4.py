@@ -1,25 +1,32 @@
-"""Run STEP 4 Verilog tests with XSim, without opening or modifying the XPR."""
+"""XPR을 수정하지 않고 XSim 검증을 실행한다."""
 
 import argparse
 import os
-from pathlib import Path
 import re
 import shutil
 import subprocess
 import sys
 from datetime import datetime
+from pathlib import Path
 
 
 def main(stage=4):
-    parser = argparse.ArgumentParser(description=f"Run STEP {stage} XSim tests without modifying the XPR.")
-    parser.add_argument("--vivado-bin", type=Path, help="Vivado bin directory (or set VIVADO_BIN)")
+    parser = argparse.ArgumentParser(
+        description=f"Run STEP {stage} XSim tests without modifying the XPR."
+    )
+    parser.add_argument(
+        "--vivado-bin", type=Path, help="Vivado bin directory (or set VIVADO_BIN)"
+    )
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
-    tool_dir = args.vivado_bin or (Path(os.environ["VIVADO_BIN"]) if os.environ.get("VIVADO_BIN") else None)
+    configured_dir = args.vivado_bin or os.environ.get("VIVADO_BIN")
+    tool_dir = Path(configured_dir).expanduser().resolve() if configured_dir else None
     suffix = ".bat" if os.name == "nt" else ""
 
     def tool(name):
-        candidate = tool_dir / (name + suffix) if tool_dir else shutil.which(name + suffix)
+        candidate = (
+            tool_dir / (name + suffix) if tool_dir else shutil.which(name + suffix)
+        )
         if not candidate or not Path(candidate).is_file():
             parser.error(f"{name} not found; pass --vivado-bin or set VIVADO_BIN")
         return str(candidate)
@@ -48,8 +55,15 @@ def main(stage=4):
 
     def run(label, command):
         print(f"[{label}]", flush=True)
-        result = subprocess.run(command, cwd=out, capture_output=True, text=True,
-                                encoding="utf-8", errors="replace", timeout=180)
+        result = subprocess.run(
+            command,
+            cwd=out,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=180,
+        )
         output = result.stdout + result.stderr
         (out / f"{label}.txt").write_text(output, encoding="utf-8")
         print(output, end="", flush=True)
@@ -59,19 +73,43 @@ def main(stage=4):
 
     run("compile", compile_args)
     for name in tests:
-        run(f"elaborate_{name}", [executables["xelab"], name, "-s", name, "-debug", "typical"])
+        run(
+            f"elaborate_{name}",
+            [executables["xelab"], name, "-s", name, "-debug", "typical"],
+        )
         tcl = out / f"{name}.tcl"
         wave_command = "log_wave -r /"
         if name == "tb_servo_controller":
             # 기본 40 ms 검사는 고속 내부 카운터 대신 외부 펄스·제어 신호만 기록.
-            signals = ["scenario", "reset", "enable", "target_open", "servo_pwm", "applied",
-                       "default_reset", "default_target", "default_pwm", "default_applied"]
-            wave_command = "log_wave " + " ".join(f"/{name}/{signal}" for signal in signals)
+            signals = [
+                "scenario",
+                "reset",
+                "enable",
+                "target_open",
+                "servo_pwm",
+                "applied",
+                "default_reset",
+                "default_target",
+                "default_pwm",
+                "default_applied",
+            ]
+            wave_command = "log_wave " + " ".join(
+                f"/{name}/{signal}" for signal in signals
+            )
         tcl.write_text(wave_command + "\nrun all\nquit\n", encoding="utf-8")
         # XSim 생성 Tcl에서 Windows 역슬래시가 escape로 해석되지 않게 한다.
-        output = run(f"simulate_{name}", [executables["xsim"], name, "-tclbatch", tcl.as_posix(),
-                                         "-wdb", (out / f"{name}.wdb").as_posix()])
-        if "PASS:" not in output:
+        output = run(
+            f"simulate_{name}",
+            [
+                executables["xsim"],
+                name,
+                "-tclbatch",
+                tcl.as_posix(),
+                "-wdb",
+                (out / f"{name}.wdb").as_posix(),
+            ],
+        )
+        if not re.search(r"(?m)^PASS:", output):
             raise RuntimeError(f"{name}: PASS marker absent; logs: {out}")
     print(f"PASS: STEP {stage} tests completed. Logs and waveforms: {out}")
 

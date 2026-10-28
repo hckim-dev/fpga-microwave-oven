@@ -1,5 +1,6 @@
-"""Run all unit and board-top integration simulations."""
+"""XPR을 수정하지 않고 XSim 검증을 실행한다."""
+
 from verify_step4 import entry
 
 if __name__ == "__main__":
-    entry(10)
+    entry(stage=10)
