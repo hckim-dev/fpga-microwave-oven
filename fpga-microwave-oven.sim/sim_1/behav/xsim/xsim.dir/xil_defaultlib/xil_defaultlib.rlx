@@ -1,0 +1,12 @@
+0.7
+2020.2
+Jun 16 2026
+11:10:11
+D:/Project/FPGA/ai2/fpga-microwave-oven/fpga-microwave-oven.sim/sim_1/behav/xsim/glbl.v,1773749341,verilog,,,,glbl,,,,,,,,
+D:/Project/FPGA/ai2/fpga-microwave-oven/fpga-microwave-oven.srcs/sim_1/new/tb_input_frontend.v,1793157681,verilog,,,,tb_input_frontend,,,C:/AMDDesignTools/2026.1/Vivado/data/rsb/busdef,,,,,
+D:/Project/FPGA/ai2/fpga-microwave-oven/fpga-microwave-oven.srcs/sim_1/new/tb_timebase.v,1793157860,verilog,,,,tb_timebase,,,C:/AMDDesignTools/2026.1/Vivado/data/rsb/busdef,,,,,
+D:/Project/FPGA/ai2/fpga-microwave-oven/fpga-microwave-oven.srcs/sources_1/new/btn_debouncer.v,1793157624,verilog,,D:/Project/FPGA/ai2/fpga-microwave-oven/fpga-microwave-oven.srcs/sources_1/new/reset_synchronizer.v,,btn_debouncer,,,C:/AMDDesignTools/2026.1/Vivado/data/rsb/busdef,,,,,
+D:/Project/FPGA/ai2/fpga-microwave-oven/fpga-microwave-oven.srcs/sources_1/new/input_frontend.v,1793157624,verilog,,D:/Project/FPGA/ai2/fpga-microwave-oven/fpga-microwave-oven.srcs/sources_1/new/reset_synchronizer.v,,input_frontend,,,C:/AMDDesignTools/2026.1/Vivado/data/rsb/busdef,,,,,
+D:/Project/FPGA/ai2/fpga-microwave-oven/fpga-microwave-oven.srcs/sources_1/new/reset_synchronizer.v,1793157566,verilog,,D:/Project/FPGA/ai2/fpga-microwave-oven/fpga-microwave-oven.srcs/sources_1/new/tick_generator.v,,reset_synchronizer,,,C:/AMDDesignTools/2026.1/Vivado/data/rsb/busdef,,,,,
+D:/Project/FPGA/ai2/fpga-microwave-oven/fpga-microwave-oven.srcs/sources_1/new/rotary_decoder.v,1793157566,verilog,,D:/Project/FPGA/ai2/fpga-microwave-oven/fpga-microwave-oven.srcs/sources_1/new/tick_generator.v,,rotary_decoder,,,C:/AMDDesignTools/2026.1/Vivado/data/rsb/busdef,,,,,
+D:/Project/FPGA/ai2/fpga-microwave-oven/fpga-microwave-oven.srcs/sources_1/new/tick_generator.v,1793157717,verilog,,D:/Project/FPGA/ai2/fpga-microwave-oven/fpga-microwave-oven.srcs/sim_1/new/tb_timebase.v,,tick_generator,,,C:/AMDDesignTools/2026.1/Vivado/data/rsb/busdef,,,,,

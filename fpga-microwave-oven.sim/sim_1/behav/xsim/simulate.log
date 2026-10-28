@@ -1,0 +1,3 @@
+Time resolution is 1 ps
+PASS: default 100 MHz, exact 100000-clock tick and 1000000-clock stable debounce after two synchronizer clocks
+$finish called at time : 10000046 ns : File "D:/Project/FPGA/ai2/fpga-microwave-oven/fpga-microwave-oven.srcs/sim_1/new/tb_timebase.v" Line 48
