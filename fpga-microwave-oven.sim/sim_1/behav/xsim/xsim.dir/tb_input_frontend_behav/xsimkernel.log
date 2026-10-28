@@ -1,7 +1,0 @@
-Running: xsim.dir/tb_input_frontend_behav/xsimk.exe -simmode gui -wdb tb_input_frontend_behav.wdb -simrunnum 0 -socket 51295
-Design successfully loaded
-Design Loading Memory Usage: 19148 KB (Peak: 19148 KB)
-Design Loading CPU Usage: 77 ms
-Simulation completed
-Simulation Memory Usage: 20164 KB (Peak: 20164 KB)
-Simulation CPU Usage: 139 ms

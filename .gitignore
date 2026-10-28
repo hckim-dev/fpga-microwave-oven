@@ -1,3 +1,52 @@
-# Reproducible local verification output.
+# Local verification and regenerated projects.
 /build/
+
+# Vivado generated directories. Keep the XPR and managed .srcs files.
+/*.cache/
+/*.gen/
+/*.hw/
+/*.ip_user_files/
+/*.runs/
+/*.sim/
+/*.tmp/
+/*.srcs/utils_1/
+/.Xil/
+/xsim.dir/
+
+# Tool output created by launching Vivado/XSim from the repository root.
+# Deliberately selected evidence under docs/ is not excluded by extension.
+/*.jou
+/*.log
+/*.pb
+/*.str
+/*.wdb
+/*.vcd
+/*.dcp
+/*.bit
+/*.ltx
+/*.rpt
+/vivado*.backup.*
+/webtalk*.xml
+/usage_statistics_webtalk.*
+/hs_err_pid*
+/replay_pid*
+/*.xpr.bak
+
+# Python environment and caches.
+/.venv/
+/venv/
 __pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Personal editor settings, backups, and OS metadata.
+/.vscode/
+/.idea/
+*~
+*.bak
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini

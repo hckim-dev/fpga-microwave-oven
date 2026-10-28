@@ -61,6 +61,15 @@ Tcl Console의 작업 디렉터리가 다르면 스크립트의 절대 경로를
 별도 프로젝트의 Design Top은 `display_controller`, Simulation Top은
 `tb_display_controller`입니다. 모두 단위 검증용이며 보드 결선을 포함하지 않습니다.
 
+## Git 관리 범위
+
+RTL·Testbench·XDC, `.xpr`, 재현/검증 스크립트와 문서를 추적합니다.
+Vivado의 `.cache`, `.hw`, `.ip_user_files`, `.runs`, `.sim`, `.gen`, `.tmp`,
+`.Xil`과 로컬 `build/`, 루트에 생성되는 로그·파형·Bitstream 등은 제외합니다.
+파형 표시 설정인 `.wcfg`와 소스 데이터인 `.mem`, `.coe`는 일괄 제외하지 않습니다.
+발표용으로 선별한 Report·이미지·파형 등은 `docs/` 아래에서 명시적으로 관리할 수 있습니다.
+자동 생성물의 추적 해제는 로컬 파일을 삭제하지 않으며 과거 커밋 이력도 변경하지 않습니다.
+
 ## 확인 범위
 
 본 단계에서는 합성·Implementation·Timing·Bitstream·보드 검증을 실행하지 않았습니다.
