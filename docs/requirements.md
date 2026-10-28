@@ -1,16 +1,16 @@
 # 요구사항 추적
 
-PDF의 기능 요구와 예시를 구분합니다. STEP 4 완료는 전자레인지 기능 완료를 뜻하지 않습니다.
+PDF의 기능 요구와 예시를 구분합니다. STEP 5 완료는 전체 기능 및 실제 보드 검증 완료를 뜻하지 않습니다.
 
 | ID | 요구사항 | 현재 구현 Source | Simulation/Testbench | 실제 Hardware | 발표 근거 |
 | --- | --- | --- | --- | --- | --- |
-| R01 | 로터리로 분·초 설정 | input_frontend.v, rotary_decoder.v: 입력 이벤트만 | tb_input_frontend: 방향·누적·오류 복구 PASS. 시간 설정 미구현 | 미확인 | STEP 4 로그/WDB |
+| R01 | 로터리로 분·초 설정 | `input_frontend.v`, `rotary_decoder.v`, `microwave_controller.v` | 입력·제어·연계 TB PASS: 00:00~59:59 설정과 경계 | 미확인 | STEP 4/5 로그·WDB |
 | R02 | 문 열기/닫기 효과음 | 버튼 입력 이벤트만 | `tb_input_frontend`: 열기/닫기 입력 PASS. 소리 미구현 | 미확인 | 미확보 |
 | R03 | 버튼마다 BEEP | 7개 버튼 이벤트만 | `tb_input_frontend`: 바운스·홀드·동시 입력 PASS. BEEP 미구현 | 미확인 | STEP 4 입력 검증 기록 |
-| R04 | 동작 종료 알림 | 미구현 | 미실행 | 미확인 | 미확보 |
+| R04 | 동작 종료 알림 | `microwave_controller.v`: DONE와 만료 이벤트만 | 제어·연계 TB PASS: 만료 1회, 완료/KEY 확인. 소리·점멸 미구현 | 미확인 | STEP 5 로그·WDB |
 | R05 | 동작 표시 | 미구현 | 미실행 | 미확인 | 미확보 |
-| R06 | 취소 | 취소 버튼 이벤트만 | tb_input_frontend: 입력 PASS. 취소 동작 미구현 | 미확인 | 미확보 |
-| R07 | 서보로 문 개폐 | 개폐 요청 이벤트만 | tb_input_frontend: 입력 PASS. 서보 미구현 | 미확인 | 미확보 |
+| R06 | 취소 | `microwave_controller.v`: 전 상태 시간 초기화·IDLE·실행 허가 차단 | 제어·연계 TB PASS. 실제 모터·서보·소리 취소는 이후 통합 필요 | 미확인 | STEP 5 로그·WDB |
+| R07 | 서보로 문 개폐 | 입력 이벤트·가열 시작 차단/중단만 | 제어·연계 TB PASS: 논리적 닫힘 조건과 수동 재개. 서보 미구현 | 미확인 | STEP 5 로그·WDB, 실제 개폐는 미확보 |
 | R08 | 모터 PWM 속도 제어 | 속도 +/- 이벤트만 | `tb_input_frontend`: 입력 PASS. PWM 미구현 | 미확인 | 미확보 |
 | R09 | 자체 아이디어 | 기본 기능 안정화 후 선정 | 미실행 | 미확인 | 미확보 |
 

@@ -1,4 +1,48 @@
-# STEP 4 검증 기록
+# 검증 기록
+
+## STEP 5 - 시간·가열 제어
+
+2026-10-28, XSim 2026.1에서 `scripts/verify_step5.py`로 현재 TB 4개를 실행했습니다.
+STEP 4 입력 테스트 2개를 포함한 회귀 검사입니다.
+
+| 완료 조건 | 실제 결과 |
+| --- | --- |
+| 분/초 개별 0~59 포화와 00:00~59:59 설정 | PASS |
+| 분/초 선택과 회전 동시 입력, 반대 회전 동시 입력 | PASS |
+| 0초·도어 열림 상태의 시작 차단 | PASS |
+| 1,000 tick 후 감소 및 01:00 -> 00:59 | PASS |
+| RUN/PAUSED 편집 차단과 부분 시간 보존·재개 | PASS |
+| 닫힘 조건 상실 또는 열기 요청의 실행 중단 | PASS |
+| 문 닫기만으로 자동 재개하지 않음 | PASS |
+| 열기 > 닫기/만료/KEY, 만료 > KEY, 취소 > 나머지 | PASS |
+| DONE 확인과 한 클럭 만료 이벤트, 0초 underflow 방지 | PASS |
+| IDLE/RUN/PAUSED/DONE에서 취소, DONE 외부의 alert_done 무시 | PASS |
+| 원시 로터리·KEY·개폐·취소 입력부터 제어 결과까지 | PASS |
+| STEP 4 입력·시간 기준 회귀 | PASS |
+| 실제 보드 및 전체 출력과의 통합 | 미실행 |
+
+`tb_microwave_controller`는 논리 이벤트를 직접 공급합니다. 입력/관찰 신호는
+`scenario`, `button_pulse`, `rotary_cw/ccw`, `tick_1ms`, `door_closed`, `alert_done`,
+`state`, `remaining_seconds`, `select_minutes`, `run_enable`, `timeout_pulse`,
+내부 부분 시간 `r_elapsed_ms`입니다. 상태·시간·이벤트 횟수를 기대값과 자동 비교합니다.
+1클럭을 1 ms tick으로 사용하되 내부 1초당 1,000 tick은 유지합니다.
+
+`tb_input_controller`는 기존 입력 RTL과 제어부만 연결합니다. 바운스 제거 후 CW 한 클릭으로
+1초를 설정하고, KEY 길게 누름으로 한 번 시작한 뒤 열기·닫기·재개·자연 만료·취소를 검사합니다.
+입력과 tick Parameter만 축소합니다. 도어 상태는 TB의 논리 입력이며 실제 서보/센서가 아닙니다.
+이는 단위 간 Interface 검사이며 전체 전자레인지 Integration 단계는 아닙니다.
+
+최종 실행 근거는 `build/step5/20261028_124423_193913/`의 네 PASS 로그와 WDB입니다.
+재실행 결과도 `build/step5/<실행시각>/`에 분리 저장합니다. 최종 실행의 컴파일·elaboration·
+Simulation 로그에는 경고·오류가 없습니다.
+파형은 기록했지만 GUI 시각 검토는 하지 않았습니다. 합성·Implementation·Timing·
+Bitstream·보드 실행은 이번 단계에서 수행하지 않았습니다.
+
+기존 XPR의 사용자 선택 Top을 유지하고 새 RTL 1개와 TB 2개를 등록했습니다.
+Vivado 읽기 전용 검사로 RTL 6개·TB 4개 등록을 확인했으며 검사 전후 원본 XPR의 SHA-256은
+동일했습니다. 별도 프로젝트 재생성도 현재 STEP 5 구성으로 실행하여 성공했습니다.
+
+## STEP 4 - 입력 기반
 
 ## 완료 조건과 실제 결과
 

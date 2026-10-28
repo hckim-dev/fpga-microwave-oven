@@ -31,6 +31,8 @@ def main(stage=4):
     rtl = sorted((root / "fpga-microwave-oven.srcs" / "sources_1" / "new").glob("*.v"))
     test_dir = root / "fpga-microwave-oven.srcs" / "sim_1" / "new"
     tests = ["tb_input_frontend", "tb_timebase"]
+    if stage >= 5:
+        tests += ["tb_microwave_controller", "tb_input_controller"]
     sources = rtl + [test_dir / f"{name}.v" for name in tests]
     compile_args = [executables["xvlog"], *map(str, sources)]
 
