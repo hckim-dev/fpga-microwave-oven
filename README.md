@@ -6,6 +6,8 @@
 
 **Testbench 16개 PASS · 100 MHz 내부 Timing 통과 · 실제 보드 정상 동작 확인**
 
+https://github.com/user-attachments/assets/1a4a421e-5a51-4ae9-986a-bdd6589ca600
+
 ## 주요 기능
 
 | 기능 | 동작 |
@@ -16,8 +18,6 @@
 | 모터 제어 | 1 kHz PWM, 듀티 30/50/70/90% |
 | 표시·소리 | 남은 시간/회전 패턴 교대, 버튼음·개폐 효과음·종료 알림 3회 |
 | 조작 잠금 | SW0로 설정·시작·재개 차단, 정지·취소·개폐 허용 |
-
-<p><img src="docs/assets/hardware_overview.jpg" alt="Basys3와 로터리·서보·모터·부저의 실제 구성" width="640"></p>
 
 ## 설계에서 해결한 문제
 
@@ -36,9 +36,9 @@ RTL 14개를 단일 클럭으로 연결했습니다. [구조·FSM](docs/design.m
 | --- | --- | --- | --- |
 | Testbench 16개 PASS | Bitstream 생성·DRC 위반 0 | Setup +0.222 ns / Hold +0.122 ns | LUT 3.96% / FF 1.10% |
 
-실제 보드의 기본 기능과 SW0 잠금은 정상 동작 확인을 받았습니다. 시연 영상은 편집 중입니다.
+실제 보드의 기본 기능과 SW0 잠금은 정상 동작 확인을 받았습니다.
 문 위치는 서보 명령·시간으로 추정하며, 실제 가열 장치와 위치 센서는 사용하지 않습니다.
-측정 범위와 남은 도구 경고는 [검증 결과](docs/verification.md)에 정리했습니다.
+[검증 결과](docs/verification.md)에서 Simulation·Timing·실기 확인 범위를 구분했습니다.
 
 ## 자세히 보기
 
