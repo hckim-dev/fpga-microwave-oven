@@ -24,6 +24,15 @@ flowchart LR
   DOOR -->|수락한 개폐 이벤트| SOUND
 ```
 
+<details>
+<summary>포트별 상세 블록도</summary>
+
+![Top RTL 포트·버스 폭·분기 연결을 표시한 상세 블록도](assets/microwave_architecture_detailed.png)
+
+[상세 블록도 원본 확대](assets/microwave_architecture_detailed.png) — 신호 이름은 원본을 열어 확대하면 읽기 쉽습니다.
+
+</details>
+
 전체 Top은 배선과 상태 LED를 담당합니다. 입력 계층의 Reset 동기화기·tick·debouncer·
 rotary decoder를 포함해 RTL 파일은 14개입니다. 외부 입력만 비동기이며, 나머지는 모두
 100 MHz `clk`를 사용합니다. `tick_1ms`는 새 클럭이 아닌 한 클럭 폭의 enable입니다.
@@ -37,51 +46,28 @@ rotary decoder를 포함해 RTL 파일은 14개입니다. 외부 입력만 비�
 | 가열 → 모터 | RUN 상태와 정지 요청을 반영한 실행 허가 |
 | 표시 → 가열/부저 | 완료 통지와 공유 종료 알림 envelope |
 
-## 가열 FSM
+## 동작 FSM
 
-```mermaid
-stateDiagram-v2
-  [*] --> IDLE
-  IDLE --> RUN: KEY / 시간 있음·닫힘·잠금 해제
-  RUN --> PAUSED: KEY 또는 열기 또는 닫힘 조건 상실
-  PAUSED --> RUN: KEY / 닫힘·잠금 해제
-  RUN --> DONE: 마지막 1초 만료
-  DONE --> IDLE: 알림 완료 또는 KEY
-  RUN --> IDLE: 취소
-  PAUSED --> IDLE: 취소
-  DONE --> IDLE: 취소
-```
+가열과 도어 상태를 별도로 관리하고, 닫힘 추정 상태를 통해 시작·중단·재개를 연계합니다.
 
-Reset은 어느 상태에서나 IDLE·0초·초 선택으로 초기화합니다. 분·초 편집은 IDLE에서만
-허용하고 각 필드를 0~59로 포화시킵니다. 1초 미만의 누적 시간을 보존하므로 일시정지/재개마다
-새 1초를 기다리는 방식으로 시간이 늘어나지 않습니다.
+![가열 4상태와 도어 5상태의 전이 및 시작·재개·잠금 조건](assets/microwave_fsm.png)
 
-동시 이벤트 우선순위는 Reset → 취소 → 열기 → 닫기 → 닫힘 조건 상실 → 만료 →
-KEY → 필드 선택 → 회전입니다. 정지 이벤트는 상태 레지스터 갱신 전에도 실행 허가를
-차단합니다. 이는 입력 동기화·필터 이후의 논리 동작이며 물리 스위치의 무지연 반응을 뜻하지 않습니다.
+[FSM 원본 확대](assets/microwave_fsm.png)
 
-## 도어 FSM
+<details>
+<summary>상태 전이의 상세 규칙</summary>
 
-```mermaid
-stateDiagram-v2
-  [*] --> UNKNOWN
-  UNKNOWN --> OPENING: 열기
-  UNKNOWN --> CLOSING: 닫기
-  CLOSED --> OPENING: 열기
-  OPEN --> CLOSING: 닫기
-  OPENING --> OPEN: 명령 적용 확인 후 대기 완료
-  CLOSING --> CLOSED: 명령 적용 확인 후 대기 완료
-  OPENING --> UNKNOWN: 취소
-  CLOSING --> UNKNOWN: 취소
-```
+- 시간 편집은 IDLE에서만 허용하며 분·초 각각 0~59로 포화합니다. 일시정지 중에는 1초 미만의 누적 시간도 보존합니다.
+- 동시 이벤트 우선순위는 Reset → 취소 → 열기 → 닫기 → 닫힘 조건 상실 → 만료 → KEY → 필드 선택 → 회전입니다.
+- 정지 요청은 상태 레지스터 갱신 전에도 실행 허가를 차단합니다. 외부 접점에는 입력 동기화·필터 지연이 있습니다.
+- 도어는 서보 프레임에 목표가 적용된 뒤 기본 500 ms를 기다려 OPEN/CLOSED로 추정합니다. 실제 도착 피드백은 없습니다.
+- 이동 중 중복·반대 개폐 요청은 무시합니다. 닫기만으로 가열을 재개하지 않고 KEY를 다시 요구합니다.
+- 이동 중 취소는 서보를 차단하고 UNKNOWN으로 복귀합니다. 안정 위치에서 취소하면 유지 펄스를 계속 출력합니다.
 
-Reset 시 문이 닫혔다고 가정하지 않습니다. 서보 프레임에 목표가 적용된 뒤 기본 500 ms를
-계수하고 OPEN/CLOSED로 추정합니다. 적용 확인은 프레임 시작을 뜻하며 실제 도착 피드백이 아닙니다.
-닫힌 뒤 가열을 자동 재개하지 않고 KEY를 다시 요구합니다. 이동 중 중복·반대 요청은
-무시하되 적용 확인과 대기 계수는 계속 처리합니다.
+모터·서보는 주기 카운터와 래치로 구동합니다. 부저의 BEEP_IDLE/BEEP_ON/BEEP_GAP과
+개폐 효과음 큐는 출력 모듈 내부의 별도 제어입니다.
 
-모터·서보 출력은 주기 카운터와 래치로 제어합니다. 별도 FSM을 추가하지 않았습니다.
-부저는 BEEP_IDLE/BEEP_ON/BEEP_GAP 상태와 개폐 효과음 큐를 사용합니다.
+</details>
 
 ## 설계 선택
 
