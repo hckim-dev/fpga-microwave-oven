@@ -3,7 +3,7 @@
 Basys3, EC11 로터리, SG90 서보, SM-1205C 부저, R300 모터와 L298N 드라이버를 사용합니다.
 외부 택트 스위치 2개는 문 열기·닫기 요청용입니다. 전원은 현재 구성의 Basys3 Pmod 3.3 V를 사용합니다.
 
-[전체 구성 사진](assets/hardware_overview.jpg) · [실제 시연 영상](https://github.com/user-attachments/assets/1a4a421e-5a51-4ae9-986a-bdd6589ca600)
+[전체 구성 사진](assets/hardware_overview.jpg) · [실제 시연 영상](https://github.com/user-attachments/assets/339a04de-37d3-44b4-93c6-2343d36fdcb4)
 
 ![Pmod 연결부와 외부 스위치 회로](assets/wiring_detail.jpg)
 

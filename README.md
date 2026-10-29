@@ -6,7 +6,7 @@
 
 **Testbench 16개 PASS · 100 MHz 내부 Timing 통과 · 실제 보드 정상 동작 확인**
 
-https://github.com/user-attachments/assets/1a4a421e-5a51-4ae9-986a-bdd6589ca600
+https://github.com/user-attachments/assets/339a04de-37d3-44b4-93c6-2343d36fdcb4
 
 ## 주요 기능
 
