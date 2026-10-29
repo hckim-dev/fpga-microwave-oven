@@ -75,21 +75,6 @@
 두 이미지는 Vivado Simulation 캡처에 설명을 추가한 자료입니다. 대기·필터 계수는 축소했으며
 하드웨어 실측과 구분합니다. 설명 이미지는 PPT와 GitHub에서 바로 사용하는 PNG로 제공합니다.
 
-<details>
-<summary>잠금 경계의 VCD 데이터와 재생성</summary>
-
-같은 잠금 경계 시나리오의 XSim 데이터를 별도로 추출했습니다.
-100 MHz 클럭, 버튼 필터 3클럭 조건에서 원본 48,510~48,630 ns를 발췌했으며
-동시 입력 시점 48,530 ns를 0으로 표시한 파형입니다.
-KEY raw는 눌림을 1로 나타낸 TB 신호이고 실제 KEY 포트는 active-low입니다.
-같은 시각의 델타 갱신은 마지막 값으로 표시했습니다.
-
-[추출 파형 PNG](evidence/control_lock_boundary.png) · [벡터 SVG](evidence/control_lock_boundary.svg) ·
-[VCD](evidence/control_lock_boundary.vcd) · [SHA-256·시간 구간](evidence/control_lock_boundary.json) ·
-[재생성 방법](reproduction.md)
-
-</details>
-
 ## 근거와 한계
 
 로컬 실행 결과는 Git에서 제외한 다음 경로에 저장했습니다. 새 실행은 [실행 방법](reproduction.md)을 따릅니다.
@@ -98,7 +83,5 @@ KEY raw는 눌림을 1로 나타낸 TB 신호이고 실제 KEY 포트는 active-
 | --- | --- |
 | 전체 회귀 | build/step11/20261028_152816_897567/ |
 | 합성·배치배선·STA | build/board/20261028_152128_18104/ |
-| 파형 추출 재실행 | build/portfolio_evidence/export_console.txt, tb_top_control_lock PASS |
 
-공개 VCD는 원본 구간과 신호별로 대조하고 해시를 확인했습니다. PNG·SVG·VCD의 동일 재생성과 이미지 표시를 확인했습니다.
 실기 정상 보고는 항목별 측정 결과와 구분합니다. 실제 RPM·전압/전류·문 도착 정확도는 측정하지 않았습니다.

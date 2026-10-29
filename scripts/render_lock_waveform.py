@@ -60,7 +60,7 @@ def read_vcd(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("vcd", type=Path)
-    parser.add_argument("--output-dir", type=Path, default=Path("docs/evidence"))
+    parser.add_argument("--output-dir", type=Path, default=Path("build/waveform_preview"))
     args = parser.parse_args()
     if args.vcd.resolve() == (args.output_dir / "control_lock_boundary.vcd").resolve():
         raise ValueError("Use another --output-dir to preserve the input VCD")

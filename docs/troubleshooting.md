@@ -42,8 +42,8 @@
 | 결과 | 동일 회귀·잠금 단위 경계·기존 기능을 포함한 16개 TB PASS |
 | 근거 | control_lock·tb_top_control_lock · 수정 전 로그: build/step11_unlock_boundary_before_fix/simulate.txt |
 
-[파형과 원본 데이터](verification.md)의 노란 구간에서는 KEY pulse가 1이어도
-previous locked가 남아 KEY to controller는 0입니다. 가열 상태는 IDLE을 유지합니다.
+[잠금 경계 파형](verification.md#잠금-해제와-key-동시-입력)에서는 KEY 펄스가 발생해도
+`r_was_locked`가 한 클럭 더 남아 `control_buttons`는 0입니다. 가열 상태는 IDLE을 유지합니다.
 정지·취소·문 개폐·종료 확인에는 추가 차단을 적용하지 않았습니다.
 
 수정 전 로컬 로그는 Git에서 제외합니다. 현재 회귀 결과와 파형은 [검증 결과](verification.md)를 따릅니다.

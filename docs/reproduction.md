@@ -60,29 +60,5 @@ New-Item -ItemType Directory -Force build
 ## Git 범위
 
 RTL·TB·XDC·XPR·스크립트·문서를 관리합니다. 생성 프로젝트·캐시·실행 결과·대용량 WDB·
-Bitstream은 `build/` 등에 보존하고 추적하지 않습니다. 선별한 문서용 PNG·SVG·짧은 VCD·
-수치 요약은 `docs/evidence/`에서 관리합니다. `.wcfg`, `.mem`, `.coe`는 일괄 제외하지 않습니다.
-
-## 파형 재생성
-
-먼저 전체 Simulation을 실행합니다. 아래 `$simDir`는 실행 결과 경로로 바꿉니다.
-
-```powershell
-$repoRoot = (Get-Location).Path
-$vivadoBin = "C:/AMDDesignTools/2026.1/Vivado/bin"
-$simDir = "$repoRoot/build/step11/<실행시각>"
-$env:LOCK_VCD_PATH = "$repoRoot/build/control_lock_full.vcd"
-Push-Location $simDir
-& "$vivadoBin/xsim.bat" tb_top_control_lock -tclbatch "$repoRoot/scripts/export_lock_waveform.tcl" -wdb "$repoRoot/build/control_lock_export.wdb"
-Pop-Location
-python scripts/render_lock_waveform.py build/control_lock_full.vcd --output-dir docs/evidence
-```
-
-XSim의 PASS와 오류 여부를 확인한 뒤 이미지를 생성합니다. 이미지 생성에는 Matplotlib이
-필요하며 확인한 버전은 3.11.1입니다. 이 패키지는 RTL 검증의 의존성이 아닙니다.
-전체 VCD는 build에 보존하고 선택 구간·PNG·SVG·해시만 docs에 저장합니다.
-기록된 120 ns VCD만으로 다시 그릴 때는 원본 덮어쓰기를 피하도록 다른 출력 폴더를 사용합니다.
-
-```powershell
-python scripts/render_lock_waveform.py docs/evidence/control_lock_boundary.vcd --output-dir build/waveform_preview
-```
+Bitstream은 `build/` 등에 보존하고 추적하지 않습니다. 문서용 사진·영상·다이어그램·
+Vivado 캡처는 `docs/assets/`에서 관리합니다. `.wcfg`, `.mem`, `.coe`는 일괄 제외하지 않습니다.
