@@ -2,10 +2,10 @@
 
 module tb_top_control_lock;
   reg clk = 0, reset = 1, lock_switch = 1;
-  reg [6:0] buttons = 0;
-  reg [1:0] ab = 0;
-  wire [7:0] seg;
-  wire [3:0] an;
+  reg  [ 6:0] buttons = 0;
+  reg  [ 1:0] ab = 0;
+  wire [ 7:0] seg;
+  wire [ 3:0] an;
   wire [15:0] led;
   wire servo_pwm, buzzer, motor_pwm, in1, in2;
   integer scenario = 0, i, saved_fraction;
@@ -213,7 +213,7 @@ module tb_top_control_lock;
     press(7'b0010000);
     press(7'b0001000);
     check(dut.door_state == 0 && !servo_pwm, "locked moving cancellation returns UNKNOWN");
-    reset = 1;
+    reset   = 1;
     buttons = 7'b1000000;
     cycles(3);
     reset = 0;

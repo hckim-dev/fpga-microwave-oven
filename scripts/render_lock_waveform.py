@@ -143,10 +143,13 @@ def main():
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    plt.rcParams.update({
-        "font.family": "DejaVu Sans", "svg.fonttype": "none",
-        "svg.hashsalt": "fpga-microwave-oven-control-lock",
-    })
+    plt.rcParams.update(
+        {
+            "font.family": "DejaVu Sans",
+            "svg.fonttype": "none",
+            "svg.hashsalt": "fpga-microwave-oven-control-lock",
+        }
+    )
     fig, axes = plt.subplots(len(tracks), 1, figsize=(13, 8), sharex=True)
     x = [(t - trigger) * scale for t in points]
     pulse_start = next(t for t in points if value_at(tracks[5][1], t, 6))
@@ -192,7 +195,10 @@ def main():
     svg = args.output_dir / "control_lock_boundary.svg"
     fig.savefig(svg, metadata={"Date": None})
     svg.write_text(
-        "\n".join(line.rstrip() for line in svg.read_text(encoding="utf-8").splitlines()) + "\n",
+        "\n".join(
+            line.rstrip() for line in svg.read_text(encoding="utf-8").splitlines()
+        )
+        + "\n",
         encoding="utf-8",
     )
     plt.close(fig)

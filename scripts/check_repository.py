@@ -55,11 +55,14 @@ def main():
             f"Invalid selected Top: {fileset}",
         )
         if fileset == "sources_1":
-            require(option.get("Val") == "top_microwave_oven", "Board Design Top mismatch")
+            require(
+                option.get("Val") == "top_microwave_oven", "Board Design Top mismatch"
+            )
 
     # 주석으로 비활성화한 제약을 실제 핀·클럭 배정으로 세지 않는다.
     active_xdc = "\n".join(
-        line for line in xdc.read_text(encoding="utf-8").splitlines()
+        line
+        for line in xdc.read_text(encoding="utf-8").splitlines()
         if not line.lstrip().startswith("#")
     )
     pins = re.findall(
@@ -88,7 +91,10 @@ def main():
         r"\s+\[get_ports\s+\{?clk\}?\]\s*",
         clocks[0],
     )
-    require(clock is not None and float(clock.group(1)) == 10.0, "Board clock must be 100 MHz")
+    require(
+        clock is not None and float(clock.group(1)) == 10.0,
+        "Board clock must be 100 MHz",
+    )
     master = (
         source_root / "constrs_1/imports/digilent-xdc-master/Basys-3-Master.xdc"
     ).read_text(encoding="utf-8")

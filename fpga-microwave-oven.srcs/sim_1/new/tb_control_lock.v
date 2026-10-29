@@ -8,7 +8,7 @@ module tb_control_lock;
   reg cw = 0, ccw = 0;
   wire locked, min_locked, control_cw, control_ccw;
   wire [6:0] control_buttons;
-  reg [6:0] expected;
+  reg  [6:0] expected;
   integer state_index, mask, scenario = 0;
 
   control_lock #(
@@ -68,7 +68,7 @@ module tb_control_lock;
       for (state_index = 0; state_index < 4; state_index = state_index + 1) begin
         cook_state = state_index;
         for (mask = 0; mask < 128; mask = mask + 1) begin
-          buttons = mask;
+          buttons  = mask;
           expected = buttons;
           if (want_locked) begin
             expected[2:0] = 0;
@@ -84,11 +84,11 @@ module tb_control_lock;
       ccw = 0;
       #1;
       check(control_cw == !want_locked && !control_ccw, "CW permission");
-      cw = 0;
+      cw  = 0;
       ccw = 1;
       #1;
       check(control_ccw == !want_locked && !control_cw, "CCW permission");
-      cw = 0;
+      cw  = 0;
       ccw = 0;
       @(negedge clk);
     end
